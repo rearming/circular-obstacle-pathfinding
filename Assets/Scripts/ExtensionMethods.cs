@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Policy;
+using Priority_Queue;
+using UnityEngine;
 
 public static class ExtensionMethods
 {
 	public static bool AddWithAction<T>(this HashSet<T> hashSet, T item, Action<T> onAdd)
 	{
-		onAdd(item); 
+		onAdd(item);
 		return hashSet.Add(item);
 	}
 
