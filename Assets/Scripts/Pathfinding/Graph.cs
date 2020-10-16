@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Pathfinding
 {
-	public class Graph<T> : IEnumerable<Node<T>>
+	public class Graph<T> : IEnumerable<Node<T>>, IGraph<T> where T : IEquatable<T>
 	{
 		private List<Node<T>> Nodes = new List<Node<T>>();
 
@@ -23,12 +23,12 @@ namespace Pathfinding
 
 		public void ConnectNodes(Node<T> node1, Node<T> node2, int cost = 1)
 		{
-			var graphHode1 = Nodes.Find(n => n == node1);
-			var graphNode2 = Nodes.Find(n => n == node2);
+			var graphHode1 = Nodes.Find(n => n.Content.Equals(node1.Content));
+			var graphNode2 = Nodes.Find(n => n.Content.Equals(node2.Content));
 			
 			if (graphHode1 == null || graphNode2 == null)
 				return;
-			
+
 			graphHode1.Links.Add(new NodeWithEdge<T>(graphNode2, cost));
 			graphNode2.Links.Add(new NodeWithEdge<T>(graphHode1, cost));
 		}
@@ -63,7 +63,7 @@ namespace Pathfinding
 		}
 	}
 
-	public class Node<T>
+	public class Node<T> where T : IEquatable<T>
 	{
 		public T Content { get; set; }
 		public List<NodeWithEdge<T>> Links { get; private set; } = new List<NodeWithEdge<T>>();
@@ -76,9 +76,14 @@ namespace Pathfinding
 		private Node() { }
 		
 		public static implicit operator Node<T>(T cont) => new Node<T>(cont);
+
+		public override string ToString()
+		{
+			return Content.ToString();
+		}
 	}
 
-	public class NodeWithEdge<T>
+	public class NodeWithEdge<T> where T : IEquatable<T>
 	{
 		public Edge Edge { get; private set; }
 		public Node<T> Node { get; private set; }

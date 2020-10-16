@@ -25,7 +25,7 @@ namespace Pathfinding
 	// frontier.put(next, priority)
 	// came_from[next] = current
 	
-	public class AStar<T>
+	public class AStar<T> where T : IEquatable<T>
 	{
 		private Node<T> start;
 		private Node<T> goal;
@@ -35,9 +35,9 @@ namespace Pathfinding
 		private Dictionary<Node<T>, Node<T>> cameFrom = new Dictionary<Node<T>, Node<T>>();
 		private Dictionary<Node<T>, int> costSoFar = new Dictionary<Node<T>, int>();
 
-		private Graph<T> graph;
+		private IGraph<T> graph;
 
-		public AStar(Graph<T> graph, Func<Node<T>, Node<T>, int> heuristic)
+		public AStar(IGraph<T> graph, Func<Node<T>, Node<T>, int> heuristic)
 		{
 			this.graph = graph;
 			this.heuristic = heuristic;

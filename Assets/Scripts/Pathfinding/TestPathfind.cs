@@ -1,56 +1,72 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Pathfinding
 {
 	public class TestPathfind : MonoBehaviour
 	{
-		[SerializeField] private int width;
-		[SerializeField] private int height;
+		[TextArea(10, 30)]
+		[SerializeField] private string rawMap;
+		
+		[SerializeField] private char start = 'S';
+		[SerializeField] private char end = 'E';
+		[SerializeField] private char empty = '*';
+		[SerializeField] private char obstacle = '#';
 
+		private char[,] map;
+		
 		private Graph<Vector2Int> graph = new Graph<Vector2Int>();
 		
 		private void Start()
 		{
-			GenerateGridGraph();
-			PrintGraph();
+			GetMap();
+			GetNodes();
+			ConnectNodes();
 		}
 
-		private void PrintGraph()
+		private void GetMap()
+		{
+			var splitMap = rawMap.Split('\n');
+			var maxWidth = splitMap.Max(s => s.Length);
+			var maxHeight = splitMap.Length;
+			
+			splitMap = splitMap.Select(s => s.PadRight(maxWidth, obstacle)).ToArray();
+			rawMap = string.Join("\n", splitMap); // correct in inspector
+
+			map = new char[maxHeight, maxWidth];
+			for (int y = 0; y < maxHeight; y++)
+			{
+				for (int x = 0; x < maxWidth; x++)
+					map[y, x] = splitMap[y][x];
+			}
+		}
+
+		private void GetNodes()
+		{
+			for (int y = 0; y < map.GetLength(0); y++)
+			{
+				for (int x = 0; x < map.GetLength(1); x++)
+				{
+					if (map[y, x] != obstacle)
+						graph.AddNode(new Vector2Int(x, y));
+				}
+			}
+		}
+
+		private void ConnectNodes()
 		{
 			foreach (var node in graph)
-			{
-				Debug.Log($"Node: [{node.Content.ToString()}]");
-				Debug.Log("");
-				foreach (var neighbor in node.Links)
-				{
-					Debug.Log($"Neighbor: [{neighbor.Node.Content.ToString()}], cost: [{neighbor.Edge.Cost.ToString()}]");
-				}
-				Debug.Log("-------------------------------------------");
-			}
+				ConnectGridNode(node.Content);
 		}
 
-		private void GenerateGridGraph()
-		{
-			for (int y = 0; y < height; y++)
-			{
-				for (int x = 0; x < width; x++)
-				{
-					var newNode = new Node<Vector2Int>(new Vector2Int(x, y));
-					graph.AddNode(newNode);
-					ConnectNode(newNode.Content);
-				}
-			}
-		}
-
-		private void ConnectNode(Vector2Int nodeContent)
+		private void ConnectGridNode(Vector2Int nodeContent)
 		{
 			for (int y = nodeContent.y - 1; y <= nodeContent.y + 1; y++)
 			{
 				for (int x = nodeContent.x - 1; x <= nodeContent.x + 1; x++)
 				{
-					if (x < 0 || y < 0 || x >= width || y >= height)
-						continue;
 					if (x == nodeContent.x && y == nodeContent.y)
 						continue;
 					graph.ConnectNodes(nodeContent, new Vector2Int(x, y));
