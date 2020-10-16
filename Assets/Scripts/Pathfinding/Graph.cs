@@ -21,6 +21,12 @@ namespace Pathfinding
 			Nodes.Add(n);
 		}
 
+		public void ConnectAllNodes(Action<Node<T>> connectorFunc)
+		{
+			foreach (var node in Nodes)
+				connectorFunc(node);
+		}
+
 		public void ConnectNodes(Node<T> node1, Node<T> node2, int cost = 1)
 		{
 			var graphHode1 = Nodes.Find(n => n.Content.Equals(node1.Content));
@@ -40,6 +46,12 @@ namespace Pathfinding
 				node.Links.RemoveAt(node.Links.FindIndex(nwe => nwe.Node == n));
 			}
 			Nodes.Remove(n);
+		}
+
+		public bool FindNode(Node<T> node, out Node<T> result)
+		{
+			result = Nodes.Find(n => n.Content.Equals(node.Content));
+			return result != null;
 		}
 
 		public List<Node<T>> Neighbors(Node<T> current)
@@ -65,22 +77,21 @@ namespace Pathfinding
 
 	public class Node<T> where T : IEquatable<T>
 	{
-		public T Content { get; set; }
+		public T Content { get; }
+		
 		public List<NodeWithEdge<T>> Links { get; private set; } = new List<NodeWithEdge<T>>();
 
-		public Node(T content)
-		{
-			this.Content = content;
-		}
+		public Node(T content) => this.Content = content;
 
 		private Node() { }
 		
 		public static implicit operator Node<T>(T cont) => new Node<T>(cont);
 
-		public override string ToString()
-		{
-			return Content.ToString();
-		}
+		public override string ToString() => Content.ToString();
+		
+		public override bool Equals(object obj) => Content.Equals(((Node<T>) obj).Content);
+		
+		public override int GetHashCode() => Content.GetHashCode();
 	}
 
 	public class NodeWithEdge<T> where T : IEquatable<T>

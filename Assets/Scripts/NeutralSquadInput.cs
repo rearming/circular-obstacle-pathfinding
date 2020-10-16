@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityTemplateProjects;
 
@@ -22,7 +20,7 @@ public class NeutralSquadInput : MonoBehaviour
 	private Camera cam;
 
 	private NeutralComponent[] allNeutrals;
-	private HashSet<NeutralComponent> selectedNeutrals = new HashSet<NeutralComponent>();
+	private readonly HashSet<NeutralComponent> selectedNeutrals = new HashSet<NeutralComponent>();
 
 	private void Awake()
 	{

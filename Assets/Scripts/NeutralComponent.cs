@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace UnityTemplateProjects
@@ -38,10 +39,22 @@ namespace UnityTemplateProjects
 			movementComponent.MovementDir = dir;
 		}
 
-		public void MoveTowards(Vector3 point)
+		public void SetMovement(Vector3 dir)
+		{
+			SetMovement(dir.ToVec2());
+		}
+
+		public void MoveTowards(Vector3 pos)
+		{
+			StartCoroutine(MoveTowardsRoutine(pos));
+		}
+		
+		private IEnumerator MoveTowardsRoutine(Vector3 point)
 		{
 			var dir = (point - transform.position).normalized;
-			movementComponent.MovementDir = new Vector2(dir.x, dir.z);
+			SetMovement(dir);
+			yield return new WaitWhile(() => Vector2.Distance(transform.position.ToVec2(), point.ToVec2()) > 0.1f);
+			SetMovement(Vector2.zero);
 		}
 	}
 }

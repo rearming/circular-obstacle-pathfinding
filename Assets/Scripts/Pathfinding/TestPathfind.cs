@@ -9,21 +9,34 @@ namespace Pathfinding
 	{
 		[TextArea(10, 30)]
 		[SerializeField] private string rawMap;
+
+		[TextArea(10, 30)]
+		[SerializeField] private string mapWithPathInspector;
 		
 		[SerializeField] private char start = 'S';
 		[SerializeField] private char end = 'E';
 		[SerializeField] private char empty = '*';
 		[SerializeField] private char obstacle = '#';
 
+		[SerializeField] private char pathChar = '$';
+
 		private char[,] map;
+		private char[][] mapWithPath;
 		
+		private Node<Vector2Int> endNode;
+		private Node<Vector2Int> startNode;
+
 		private Graph<Vector2Int> graph = new Graph<Vector2Int>();
 		
 		private void Start()
 		{
 			GetMap();
 			GetNodes();
-			ConnectNodes();
+			
+			// graph.ConnectAllNodes(ConnectGridNode8);
+			graph.ConnectAllNodes(ConnectGridNode4);
+			
+			PathfindTest();
 		}
 
 		private void GetMap()
@@ -49,29 +62,80 @@ namespace Pathfinding
 			{
 				for (int x = 0; x < map.GetLength(1); x++)
 				{
+					if (map[y, x] == start)
+						startNode = new Node<Vector2Int>(new Vector2Int(x, y));
+					if (map[y, x] == end)
+						endNode = new Node<Vector2Int>(new Vector2Int(x, y));
 					if (map[y, x] != obstacle)
 						graph.AddNode(new Vector2Int(x, y));
 				}
 			}
 		}
 
-		private void ConnectNodes()
+		private void ConnectGridNode8(Node<Vector2Int> node)
 		{
-			foreach (var node in graph)
-				ConnectGridNode(node.Content);
-		}
-
-		private void ConnectGridNode(Vector2Int nodeContent)
-		{
-			for (int y = nodeContent.y - 1; y <= nodeContent.y + 1; y++)
+			for (int y = node.Content.y - 1; y <= node.Content.y + 1; y++)
 			{
-				for (int x = nodeContent.x - 1; x <= nodeContent.x + 1; x++)
+				for (int x = node.Content.x - 1; x <= node.Content.x + 1; x++)
 				{
-					if (x == nodeContent.x && y == nodeContent.y)
+					if (x == node.Content.x && y == node.Content.y)
 						continue;
-					graph.ConnectNodes(nodeContent, new Vector2Int(x, y));
+					graph.ConnectNodes(node, new Vector2Int(x, y));
 				}
 			}
+		}
+
+		private void ConnectGridNode4(Node<Vector2Int> node)
+		{
+			var n = node.Content;
+			graph.ConnectNodes(node, new Vector2Int(n.x - 1, n.y));
+			graph.ConnectNodes(node, new Vector2Int(n.x + 1, n.y));
+			graph.ConnectNodes(node, new Vector2Int(n.x, n.y - 1));
+			graph.ConnectNodes(node, new Vector2Int(n.x, n.y + 1));
+		}
+
+		private void PathfindTest()
+		{
+			var AStar = new AStar<Vector2Int>(graph, (goal, next) =>
+			{
+				// Manhattan Distance heuristic
+				var D = 1f;
+				var dx = Mathf.Abs(next.Content.x - goal.Content.x);
+				var dy = Mathf.Abs(next.Content.y - goal.Content.y);
+				return (int)(D * dx * dy);
+			});
+			
+			AStar.SetGoal(endNode);
+			AStar.SetStart(startNode);
+			AStar.FindPath();
+			var path =	AStar.GetPath();
+			
+			PrintPath(path);
+		}
+
+		private void PrintPath(List<Node<Vector2Int>> path)
+		{
+			mapWithPath = new char[map.GetLength(0)][];
+
+			for (int y = 0; y < map.GetLength(0); y++)
+			{
+				mapWithPath[y] = new char[map.GetLength(1)];
+				for (int x = 0; x < map.GetLength(1); x++)
+				{
+					mapWithPath[y][x] = map[y, x];
+				}
+			}
+			
+			foreach (var node in path)
+			{
+				if (mapWithPath[node.Content.y][node.Content.x] == start 
+				    || mapWithPath[node.Content.y][node.Content.x] == end)
+					continue;
+				
+				mapWithPath[node.Content.y][node.Content.x] = pathChar;
+			}
+
+			mapWithPathInspector = string.Join("\n", mapWithPath.Select(s => new string(s)));
 		}
 	}
 }

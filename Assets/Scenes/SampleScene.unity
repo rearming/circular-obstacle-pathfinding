@@ -337,9 +337,9 @@ MonoBehaviour:
 
     ***##******
 
-    ####*******
+    #####******
 
-    *******###*
+    *****#####*
 
     ************
 
@@ -348,10 +348,12 @@ MonoBehaviour:
     *******###*
 
     ************'
+  mapWithPathInspector: 
   start: 83
   end: 69
   empty: 42
   obstacle: 35
+  pathChar: 36
 --- !u!4 &406249937
 Transform:
   m_ObjectHideFlags: 0
