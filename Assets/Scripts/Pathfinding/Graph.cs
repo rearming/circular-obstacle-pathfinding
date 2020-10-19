@@ -21,10 +21,13 @@ namespace Pathfinding
 			Nodes.Add(n);
 		}
 
-		public void ConnectAllNodes(Action<Node<T>> connectorFunc)
+		public void RemoveNode(Node<T> n)
 		{
-			foreach (var node in Nodes)
-				connectorFunc(node);
+			foreach (var node in Nodes) // remove all connections
+			{
+				node.Links.RemoveAt(node.Links.FindIndex(nwe => nwe.Node == n));
+			}
+			Nodes.Remove(n);
 		}
 
 		public void ConnectNodes(Node<T> node1, Node<T> node2, int cost = 1)
@@ -39,13 +42,10 @@ namespace Pathfinding
 			graphNode2.Links.Add(new NodeWithEdge<T>(graphHode1, cost));
 		}
 
-		public void RemoveNode(Node<T> n)
+		public void ConnectAllNodes(Action<Node<T>> connectorFunc)
 		{
-			foreach (var node in Nodes) // remove all connections
-			{
-				node.Links.RemoveAt(node.Links.FindIndex(nwe => nwe.Node == n));
-			}
-			Nodes.Remove(n);
+			foreach (var node in Nodes)
+				connectorFunc(node);
 		}
 
 		public bool FindNode(Node<T> node, out Node<T> result)

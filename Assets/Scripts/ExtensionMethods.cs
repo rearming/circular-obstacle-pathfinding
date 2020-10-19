@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Policy;
 using Priority_Queue;
 using UnityEngine;
@@ -24,8 +25,23 @@ public static class ExtensionMethods
 			action(elem);
 	}
 
+	public static void AddRange<T>(this HashSet<T> hashSet, HashSet<T> hashSetToAdd)
+	{
+		hashSet.UnionWith(hashSetToAdd);
+	}
+
 	public static Vector2 ToVec2(this Vector3 vec)
 	{
 		return new Vector2(vec.x, vec.z);
 	}
+	
+	public static Vector2 Rotate(this Vector2 v, float delta)
+	{
+		return new Vector2(
+			v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
+			v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
+		);
+	}
+	
+	
 }
