@@ -114,6 +114,7 @@ namespace Pathfinding
 				bitangents.AddRange(GetInternal(circle1, circle2));
 			if (!circle1.Contains(circle2))
 				bitangents.AddRange(GetExternal(circle1, circle2));
+			GenerateSurfingEdges(circle1, circle2, bitangents);
 			AddBitangents(circle1, circle2, bitangents);
 		}
 
@@ -156,9 +157,20 @@ namespace Pathfinding
 			return new List<Bitangent>{ CF, DE };
 		}
 
-		private void GenerateSurfingEdges()
+		private void GenerateSurfingEdges(Circle circle1, Circle circle2, List<Bitangent> bitangents)
 		{
-			
+			foreach (var circle in circles)
+			{
+				if (circle == circle1 || circle == circle2)
+					continue;
+				bitangents.RemoveAll(bt =>
+				{
+					var u = Vector2.Dot(circle.Center - bt.a, bt.b - bt.a) / Vector2.Dot(bt.b - bt.a, bt.b - bt.a);
+					var e = bt.a + Mathf.Clamp01(u) * (bt.b - bt.a);
+					var d = (e - circle.Center).magnitude;
+					return d < circle.Radius; // remove if (d < radius)
+				});
+			}
 		}
 		
 		private void AddBitangents(Circle circle1, Circle circle2, List<Bitangent> bitangents)
@@ -185,6 +197,25 @@ namespace Pathfinding
 				{
 					action(bitangent);
 				}
+			}
+		}
+
+		public void RemoveBitangentIf(Func<Bitangent, bool> removeIf)
+		{
+			var removals = new List<(int, int)>(); // key, index
+			foreach (var btList in Bitangents)
+			{
+				for (var i = 0; i < btList.Value.Count; i++)
+				{
+					var bitangent = btList.Value[i];
+					if (removeIf(bitangent))
+						removals.Add((btList.Key, i));
+				}
+			}
+
+			foreach (var (key, bitangentIdx) in removals)
+			{
+				Bitangents[key].RemoveAt(bitangentIdx);
 			}
 		}
 		
