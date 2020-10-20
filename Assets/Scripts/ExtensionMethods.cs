@@ -42,6 +42,10 @@ public static class ExtensionMethods
 			v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
 		);
 	}
-	
-	
+
+	public static float ScaledRadius(this CapsuleCollider col)
+	{
+		var scale = Mathf.Max(col.gameObject.transform.localScale.x, col.gameObject.transform.localScale.z);
+		return col.radius * scale;
+	}
 }
