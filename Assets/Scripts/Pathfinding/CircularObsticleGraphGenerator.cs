@@ -37,6 +37,22 @@ namespace Pathfinding
 			Center = center;
 		}
 
+		public bool Overlaps(Circle circle2)
+		{
+			var a = Radius + circle2.Radius;
+			var dx = Center.x - circle2.Center.x;
+			var dy = Center.y - circle2.Center.y;
+			return a * a > dx * dx + dy * dy;
+		}
+
+		public bool Contains(Circle circle2)
+		{
+			var d = Mathf.Sqrt(
+				circle2.Center.x - Center.x * circle2.Center.x - Center.x +
+				circle2.Center.y - Center.y * circle2.Center.y - Center.y);
+			return Radius > d + circle2.Radius;
+		}
+
 		public static bool operator ==(Circle c1, Circle c2) =>
 			c1.Center == c2.Center && Math.Abs(c1.Radius - c2.Radius) < 0.001f;
 
@@ -72,10 +88,12 @@ namespace Pathfinding
 		private CircularObsticleGraphGenerator() { }
 
 		public void SetStart(Vector2 start) => Start = start;
+		public void SetCircles(Circle[] c) => circles = c;
 		public void SetGoal(Vector2 goal) => Goal = goal;
 
 		public void GenerateGraph()
 		{
+			Bitangents.Clear();
 			foreach (var circle1 in circles)
 			{
 				foreach (var circle2 in circles)
@@ -89,14 +107,20 @@ namespace Pathfinding
 
 		private void GetBitangents(Circle circle1, Circle circle2)
 		{
-			GetInternal(circle1, circle2);
-			GetExternal(circle1, circle2);
+			if (Bitangents.ContainsKey(GetCirclesHash(circle1, circle2)))
+				return;
+			var bitangents = new List<Bitangent>();
+			if (!circle1.Overlaps(circle2))
+				bitangents.AddRange(GetInternal(circle1, circle2));
+			if (!circle1.Contains(circle2))
+				bitangents.AddRange(GetExternal(circle1, circle2));
+			AddBitangents(circle1, circle2, bitangents);
 		}
 
-		private void GetInternal(Circle circle1, Circle circle2)
+		private List<Bitangent> GetInternal(Circle circle1, Circle circle2)
 		{
 			var theta = Mathf.Acos(
-				(circle1.Radius - circle2.Radius) / Vector2.Distance(circle1.Center, circle2.Center));
+				(circle1.Radius + circle2.Radius) / Vector2.Distance(circle1.Center, circle2.Center));
 
 			var dir1 = (circle2.Center - circle1.Center).normalized * circle1.Radius;
 			var D = dir1.Rotate(theta) + circle1.Center;
@@ -109,13 +133,27 @@ namespace Pathfinding
 			var CF = new Bitangent(C, F);
 			var DE = new Bitangent(D, E);
 			
-			AddBitangents(circle1, circle2, new List<Bitangent>{ CF, DE });
+			return new List<Bitangent>{ CF, DE };
 		}
 		
 
-		private void GetExternal(Circle circle1, Circle circle2)
+		private List<Bitangent> GetExternal(Circle circle1, Circle circle2)
 		{
+			var theta = Mathf.Acos(
+				(circle1.Radius - circle2.Radius) / Vector2.Distance(circle1.Center, circle2.Center));
+
+			var dir1 = (circle2.Center - circle1.Center).normalized * circle1.Radius;
+			var D = dir1.Rotate(theta) + circle1.Center;
+			var C = dir1.Rotate(-theta) + circle1.Center;
+
+			var dir2 = -(circle1.Center - circle2.Center).normalized * circle2.Radius;
+			var E = dir2.Rotate(theta) + circle2.Center;
+			var F = dir2.Rotate(-theta) + circle2.Center;
 			
+			var CF = new Bitangent(C, F);
+			var DE = new Bitangent(D, E);
+			
+			return new List<Bitangent>{ CF, DE };
 		}
 
 		private void GenerateSurfingEdges()

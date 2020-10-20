@@ -150,7 +150,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 113156307}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.78, y: -3.81, z: -9.07}
+  m_LocalPosition: {x: 5.89, y: -3.81, z: -8.79}
   m_LocalScale: {x: 1.9537, y: 1.4557018, z: 1.9537}
   m_Children: []
   m_Father: {fileID: 2073769125}
@@ -1629,10 +1629,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 669ca0a9848049d38351cfab3e90c861, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  circlesT:
-  - {fileID: 1149505837}
-  - {fileID: 113156308}
-  - {fileID: 574970109}
+  circlesTParent: {fileID: 2073769125}
   start: {fileID: 1379870042}
   goal: {fileID: 336507303}
   gizmosHeight: -3.5

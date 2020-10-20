@@ -8,7 +8,8 @@ namespace Pathfinding
 {
 	public class TestCircularObsticleGraphGenerator : MonoBehaviour
 	{
-		[SerializeField] private Transform [] circlesT;
+		[SerializeField] private Transform circlesTParent;
+		private Tuple<Transform, CapsuleCollider> [] circlesObstacles;
 		
 		[SerializeField] private Transform start;
 		[SerializeField] private Transform goal;
@@ -20,13 +21,23 @@ namespace Pathfinding
 
 		private void Start()
 		{
+			circlesObstacles = circlesTParent.GetComponentsInChildren<CapsuleCollider>()
+				.Where(cc => cc.gameObject.activeSelf)
+				.Select(cc => Tuple.Create(cc.gameObject.transform, cc))
+				.ToArray();
+			
 			GetCircles();
 			
 			CircularGenerator = new CircularObsticleGraphGenerator<Vector2>(circles, start.position.ToVec2(), goal.position.ToVec2());
-			
-			CircularGenerator.GenerateGraph();
-			
+
 			// PrintBitangents();
+		}
+
+		private void Update()
+		{
+			GetCircles();
+			CircularGenerator.SetCircles(circles);
+			CircularGenerator.GenerateGraph();
 		}
 
 		private void PrintBitangents()
@@ -52,8 +63,7 @@ namespace Pathfinding
 
 		private void GetCircles()
 		{
-			circles = circlesT.Select(t => 
-				new Circle(t.GetComponent<CapsuleCollider>().ScaledRadius(), t.position.ToVec2())).ToArray();
+			circles = circlesObstacles.Select(t => new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2())).ToArray();
 		}
 	}
 }
