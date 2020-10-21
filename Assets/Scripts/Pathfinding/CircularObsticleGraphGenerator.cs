@@ -9,19 +9,20 @@ namespace Pathfinding
 	public class CircularObsticleGraphGenerator<T> where T : IEquatable<T>
 	{
 		private IGraph<T> graph;
-		private Circle[] circles;
+
+		public Dictionary<int, Circle> Circles { get; private set; }
 		
-		public readonly Dictionary<(Circle, Circle), List<Edge>> surfingEdges = new Dictionary<(Circle, Circle), List<Edge>>();
-		public readonly Dictionary<int, List<Vector2>> pointsOnCircle = new Dictionary<int, List<Vector2>>();
-		public readonly Dictionary<int, List<Edge>> huggingEdges = new Dictionary<int, List<Edge>>();
+		public Dictionary<int, List<Edge>> SurfingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
+		public Dictionary<int, List<Vector2>> PointsOnCircle { get; private set; } = new Dictionary<int, List<Vector2>>();
+		public Dictionary<int, List<Edge>> HuggingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
 		// key - circle.GetHashCode()
 
 		public Vector2 Start { get; private set; }
 		public Vector2 Goal { get; private set; }
 		
-		public CircularObsticleGraphGenerator(Circle[] circles, Vector2 start, Vector2 goal)
+		public CircularObsticleGraphGenerator(IEnumerable<Circle> circles, Vector2 start, Vector2 goal)
 		{
-			this.circles = circles;
+			SetCircles(circles);
 			Start = start;
 			Goal = goal;
 		}
@@ -29,15 +30,15 @@ namespace Pathfinding
 		private CircularObsticleGraphGenerator() { }
 
 		public void SetStart(Vector2 start) => Start = start;
-		public void SetCircles(Circle[] c) => circles = c;
+		public void SetCircles(IEnumerable<Circle> c) => Circles = c.ToDictionary(cr => cr.GetHashCode());
 		public void SetGoal(Vector2 goal) => Goal = goal;
 
 		public void GenerateGraph()
 		{
-			surfingEdges.Clear();
-			foreach (var circle1 in circles)
+			SurfingEdges.Clear();
+			foreach (var circle1 in Circles.Values)
 			{
-				foreach (var circle2 in circles)
+				foreach (var circle2 in Circles.Values)
 				{
 					if (circle1 == circle2)
 						continue;
@@ -51,7 +52,7 @@ namespace Pathfinding
 		
 		private void GetSurfingEdges(Circle circle1, Circle circle2)
 		{
-			if (surfingEdges.ContainsKey((circle1, circle2)))
+			if (SurfingEdges.ContainsKey(GetCirclesHash(circle1, circle2)))
 				return;
 			var bitangents = new List<Edge>();
 			if (!circle1.Overlaps(circle2))
@@ -59,7 +60,7 @@ namespace Pathfinding
 			if (!circle1.Contains(circle2))
 				bitangents.AddRange(GetExternalBitangents(circle1, circle2));
 			GenerateSurfingEdges(circle1, circle2, bitangents);
-			AddEdges(surfingEdges, (circle1, circle2), bitangents);
+			AddEdges(SurfingEdges, GetCirclesHash(circle1, circle2), bitangents);
 		}
 
 		private List<Edge> GetInternalBitangents(Circle circle1, Circle circle2)
@@ -102,7 +103,7 @@ namespace Pathfinding
 
 		private void GenerateSurfingEdges(Circle circle1, Circle circle2, List<Edge> bitangents)
 		{
-			foreach (var circle in circles)
+			foreach (var circle in Circles.Values)
 			{
 				if (circle == circle1 || circle == circle2)
 					continue;
@@ -133,22 +134,70 @@ namespace Pathfinding
 
 		#endregion
 
-		private void GetPointsOnCircle()
-		{
-			
-		}
-
 		private void GetHuggingEdges()
 		{
-			foreach (var surfingEdgeList in surfingEdges.Values)
+			GetPointsOnCircle();
+			
+			HuggingEdges.Clear();
+			foreach (var pointsList in PointsOnCircle)
 			{
-				foreach (var surfingEdge in surfingEdgeList)
+				for (var i = 0; i < pointsList.Value.Count; i++)
 				{
-					pointsOnCircle.AddToDictList(surfingEdge.circleAhash, surfingEdge.a);
-					pointsOnCircle.AddToDictList(surfingEdge.circleBhash, surfingEdge.b);
+					HuggingEdges.AddToDictList(pointsList.Key,
+						new Edge(pointsList.Value[i], pointsList.Value[(i + 1) % pointsList.Value.Count]));
+					// add point and next point as hugging edge
 				}
 			}
 		}
+
+		private void GetPointsOnCircle()
+		{
+			PointsOnCircle.Clear();
+			foreach (var surfingEdgeList in SurfingEdges.Values)
+			{
+				foreach (var surfingEdge in surfingEdgeList)
+				{
+					PointsOnCircle.AddToDictList(surfingEdge.circleAhash, surfingEdge.a);
+					PointsOnCircle.AddToDictList(surfingEdge.circleBhash, surfingEdge.b);
+				}
+			}
+			
+			var sortedPoints = new Dictionary<int, List<Vector2>>();
+			foreach (var pointsList in PointsOnCircle)
+			{
+				sortedPoints[pointsList.Key] = pointsList.Value
+					.OrderBy(v => v, VectorPolarComparer(pointsList.Key))
+					.ToList();
+			}
+
+			PointsOnCircle = sortedPoints;
+		}
+
+		Comparer<Vector2> VectorPolarComparer(int circleKey)
+		{
+			var circle = Circles[circleKey];
+			
+			return Comparer<Vector2>.Create((a, b) =>
+			{
+				a -= circle.center;
+				b -= circle.center;
+				
+				int Quad(Vector2 p)
+				{
+					if (p.x < 0 && p.y < 0) return 0;
+					if (p.x >= 0 && p.y < 0) return 1;
+					if (p.x >= 0 && p.y >= 0) return 2;
+					if (p.x < 0 && p.y >= 0) return 3;
+					return -1;
+				}
+
+				if (Quad(a) == Quad(b))
+					return a.x * b.y > a.y * b.x ? -1 : 1;
+				return Quad(a) < Quad(b) ? -1 : 1;
+			});
+		}
+		
+		
 	}
 
 	#region Helper Classes
@@ -167,6 +216,14 @@ namespace Pathfinding
 			this.b = b;
 			this.circleAhash = circleAhash;
 			this.circleBhash = circleBhash;
+		}
+		
+		public Edge(Vector2 a, Vector2 b)
+		{
+			this.a = a;
+			this.b = b;
+			circleAhash = -1;
+			circleBhash = -1;
 		}
 
 		public override string ToString() => $"a: [{a.ToString()}], b: [{b.ToString()}]";

@@ -20,6 +20,8 @@ namespace Pathfinding
 		
 		private Circle[] circles;
 		private CircularObsticleGraphGenerator<Vector2> CircularGenerator;
+		
+		
 
 		private void Start()
 		{
@@ -33,7 +35,7 @@ namespace Pathfinding
 			CircularGenerator = new CircularObsticleGraphGenerator<Vector2>(circles, start.position.ToVec2(), goal.position.ToVec2());
 			
 			CircularGenerator.GenerateGraph();
-			PrintPointsOnCircle();
+			
 		}
 
 		private void Update()
@@ -45,8 +47,8 @@ namespace Pathfinding
 
 		private void PrintPointsOnCircle()
 		{
-			Debug.Log($"points on circle count: [{CircularGenerator.pointsOnCircle.Count.ToString()}]");
-			CircularGenerator.pointsOnCircle.ForEachDictList((circleHash, point) =>
+			Debug.Log($"points on circle count: [{CircularGenerator.PointsOnCircle.Count.ToString()}]");
+			CircularGenerator.PointsOnCircle.ForEachDictListElem((circleHash, point) =>
 			{
 				Debug.Log($"circle hash: [{circleHash.ToString()}], point: [{point.ToString()}]");
 			});
@@ -56,15 +58,44 @@ namespace Pathfinding
 		{
 			if (!Application.isPlaying)
 				return;
-			CircularGenerator.surfingEdges.ForEachDictList((_, edge) =>
+			
+			DrawSurfingEdges();
+			DrawSortedCirclePoints();
+			DrawHuggingEdges();
+		}
+
+		private void DrawSurfingEdges()
+		{
+			CircularGenerator.SurfingEdges.ForEachDictListElem((_, edge) =>
 			{
 				Gizmos.color = Color.green;
-				Gizmos.DrawLine(Convert(edge.a, gizmosHeight), Convert(edge.b, gizmosHeight));
+				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
 				Gizmos.color = Color.yellow;
-				Gizmos.DrawSphere(Convert(edge.a, gizmosHeight), 0.04f);
-				Gizmos.DrawSphere(Convert(edge.b, gizmosHeight), 0.04f);
+				Gizmos.DrawSphere(edge.a.ToVec3(gizmosHeight), 0.04f);
+				Gizmos.DrawSphere(edge.b.ToVec3(gizmosHeight), 0.04f);
+			});
+		}
 
-				Vector3 Convert(Vector2 vec, float height) => new Vector3(vec.x, height, vec.y);
+		private void DrawSortedCirclePoints()
+		{
+			CircularGenerator.PointsOnCircle.ForEachDictList((circleHash, pointList) =>
+			{
+				for (var i = 0; i < pointList.Count; i++)
+				{
+					var t = pointList.Count > 1 ? (float) i / (pointList.Count - 1) : 0;
+					var center = CircularGenerator.Circles[circleHash].center.ToVec3(gizmosHeight);
+					Gizmos.color = Color.Lerp(Color.red, Color.blue, t);
+					Gizmos.DrawLine(center, Vector3.Lerp(center, pointList[i].ToVec3(gizmosHeight), Mathf.Lerp(0.5f, 1f, t)));
+				}
+			});
+		}
+
+		private void DrawHuggingEdges()
+		{
+			CircularGenerator.HuggingEdges.ForEachDictListElem(edge =>
+			{
+				Gizmos.color = ColorUtility.TryParseHtmlString("#a200cf", out var color) ? color : Color.blue;
+				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
 			});
 		}
 
@@ -75,7 +106,7 @@ namespace Pathfinding
 
 		private void SceneUpdate(SceneView sceneView)
 		{
-			Handles.DrawWireArc(Vector3.zero, Vector3.up, Vector3.right, 145, 2);
+			// Handles.DrawBezier(Vector3.zero, Vector3.up, Vector3.right, 145, 2);
 		}
 		
 		private void OnDisable()

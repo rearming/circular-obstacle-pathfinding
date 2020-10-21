@@ -45,7 +45,7 @@ namespace Utils
 				dictionary.Add(key, itemList);
 		}
 
-		public static void ForEachDictList<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<T, TK> action)
+		public static void ForEachDictListElem<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<T, TK> action)
 		{
 			foreach (var list in dictionary)
 			{
@@ -55,6 +55,29 @@ namespace Utils
 				}
 			}
 		}
+		
+		public static void ForEachDictListElem<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<TK> action)
+		{
+			foreach (var list in dictionary)
+			{
+				foreach (var item in list.Value)
+				{
+					action(item);
+				}
+			}
+		}
+		
+		public static void ForEachDictList<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<List<TK>> action)
+		{
+			foreach (var list in dictionary)
+				action(list.Value);
+		}
+		
+		public static void ForEachDictList<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<T, List<TK>> action)
+		{
+			foreach (var list in dictionary)
+				action(list.Key, list.Value);
+		}
 
 		public static void RemoveDictListIf<T, TK>(this IDictionary<T, List<TK>> dictionary, Func<TK, bool> removeIf)
 		{
@@ -63,8 +86,8 @@ namespace Utils
 			{
 				for (var i = 0; i < list.Value.Count; i++)
 				{
-					var bitangent = list.Value[i];
-					if (removeIf(bitangent))
+					var item = list.Value[i];
+					if (removeIf(item))
 						removals.Add((list.Key, i));
 				}
 			}
@@ -79,6 +102,9 @@ namespace Utils
 		{
 			return new Vector2(vec.x, vec.z);
 		}
+		
+		public static Vector3 ToVec3(this Vector2 vec, float height) => new Vector3(vec.x, height, vec.y);
+		
 	
 		public static Vector2 Rotate(this Vector2 v, float delta)
 		{
@@ -86,6 +112,11 @@ namespace Utils
 				v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
 				v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
 			);
+		}
+
+		public static float Cross(this Vector2 a, Vector2 b)
+		{
+			return a.x * b.y - b.y * a.x;
 		}
 
 		public static float ScaledRadius(this CapsuleCollider col)
