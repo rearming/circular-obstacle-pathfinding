@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
+using Utils;
 using Random = System.Random;
 
 namespace Pathfinding
@@ -9,7 +11,7 @@ namespace Pathfinding
 	public class TestCircularObsticleGraphGenerator : MonoBehaviour
 	{
 		[SerializeField] private Transform circlesTParent;
-		private Tuple<Transform, CapsuleCollider> [] circlesObstacles;
+		private (Transform, CapsuleCollider) [] circlesObstacles;
 		
 		[SerializeField] private Transform start;
 		[SerializeField] private Transform goal;
@@ -23,14 +25,15 @@ namespace Pathfinding
 		{
 			circlesObstacles = circlesTParent.GetComponentsInChildren<CapsuleCollider>()
 				.Where(cc => cc.gameObject.activeSelf)
-				.Select(cc => Tuple.Create(cc.gameObject.transform, cc))
+				.Select(cc => (cc.gameObject.transform, cc))
 				.ToArray();
 			
 			GetCircles();
 			
 			CircularGenerator = new CircularObsticleGraphGenerator<Vector2>(circles, start.position.ToVec2(), goal.position.ToVec2());
-
-			// PrintBitangents();
+			
+			CircularGenerator.GenerateGraph();
+			PrintPointsOnCircle();
 		}
 
 		private void Update()
@@ -40,25 +43,44 @@ namespace Pathfinding
 			CircularGenerator.GenerateGraph();
 		}
 
-		private void PrintBitangents()
+		private void PrintPointsOnCircle()
 		{
-			CircularGenerator.ForEachBitangent(bitangent =>
+			Debug.Log($"points on circle count: [{CircularGenerator.pointsOnCircle.Count.ToString()}]");
+			CircularGenerator.pointsOnCircle.ForEachDictList((circleHash, point) =>
 			{
-				Debug.Log($"bitangent [{bitangent.ToString()}]");
-				Debug.Log($"hash: [{bitangent.GetHashCode().ToString()}]");
+				Debug.Log($"circle hash: [{circleHash.ToString()}], point: [{point.ToString()}]");
 			});
 		}
-		
+
 		private void OnDrawGizmos()
 		{
 			if (!Application.isPlaying)
 				return;
-			Gizmos.color = Color.green;
-			var conv = new Func<Vector2, float, Vector3>((vec, height) => new Vector3(vec.x, height, vec.y));
-			CircularGenerator.ForEachBitangent(bitangent =>
+			CircularGenerator.surfingEdges.ForEachDictList((_, edge) =>
 			{
-				Gizmos.DrawLine(conv(bitangent.a, gizmosHeight), conv(bitangent.b, gizmosHeight));
+				Gizmos.color = Color.green;
+				Gizmos.DrawLine(Convert(edge.a, gizmosHeight), Convert(edge.b, gizmosHeight));
+				Gizmos.color = Color.yellow;
+				Gizmos.DrawSphere(Convert(edge.a, gizmosHeight), 0.04f);
+				Gizmos.DrawSphere(Convert(edge.b, gizmosHeight), 0.04f);
+
+				Vector3 Convert(Vector2 vec, float height) => new Vector3(vec.x, height, vec.y);
 			});
+		}
+
+		private void OnEnable()
+		{
+			SceneView.duringSceneGui += SceneUpdate;
+		}
+
+		private void SceneUpdate(SceneView sceneView)
+		{
+			Handles.DrawWireArc(Vector3.zero, Vector3.up, Vector3.right, 145, 2);
+		}
+		
+		private void OnDisable()
+		{
+			SceneView.duringSceneGui -= SceneUpdate;
 		}
 
 		private void GetCircles()

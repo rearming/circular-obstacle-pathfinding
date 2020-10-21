@@ -61,7 +61,7 @@ namespace Pathfinding
 		
 		public int Cost(Node<T> current, Node<T> next)
 		{
-			return current.Links.Find(node => node.Node == next).Edge.Cost;
+			return current.Links.Find(node => node.Node == next).GraphEdge.Cost;
 		}
 
 		public IEnumerator<Node<T>> GetEnumerator()
@@ -96,22 +96,22 @@ namespace Pathfinding
 
 	public class NodeWithEdge<T> where T : IEquatable<T>
 	{
-		public Edge Edge { get; private set; }
+		public GraphEdge GraphEdge { get; private set; }
 		public Node<T> Node { get; private set; }
 
 		public NodeWithEdge(Node<T> node, int cost)
 		{
-			Edge = new Edge(cost);
+			GraphEdge = new GraphEdge(cost);
 			Node = node;
 		}
 	}
 
-	public class Edge
+	public class GraphEdge
 	{
 		public int Cost { get; set; }
 		
-		public Edge(int cost) => Cost = cost;
+		public GraphEdge(int cost) => Cost = cost;
 		
-		public static implicit operator Edge(int cost) => new Edge(cost);
+		public static implicit operator GraphEdge(int cost) => new GraphEdge(cost);
 	}
 }

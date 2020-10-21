@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityTemplateProjects;
+using Utils;
 
 
 public class NeutralSquadInput : MonoBehaviour
