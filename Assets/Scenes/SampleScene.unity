@@ -1633,6 +1633,18 @@ MonoBehaviour:
   start: {fileID: 1379870042}
   goal: {fileID: 336507303}
   gizmosHeight: -3.5
+  hideObstacles: 0
+  hideObstacleMeshRenderers: 0
+  gizmosSurfingEdges:
+    draw: 1
+    color: {r: 0, g: 0.7264151, b: 0, a: 1}
+  gizmosHuggingEdges:
+    draw: 1
+    color: {r: 0.9150943, g: 0, b: 0.34600538, a: 1}
+  drawSortedCirclePoints: 0
+  gizmosGraph:
+    draw: 1
+    color: {r: 1, g: 0.44145525, b: 0, a: 1}
 --- !u!4 &2073769125
 Transform:
   m_ObjectHideFlags: 0

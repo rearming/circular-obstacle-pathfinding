@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Utils
 {
-	public static class ExtensionMethods
+	public static class CollectionsExtensions
 	{
+		#region Hash Set
+
 		public static bool AddWithAction<T>(this HashSet<T> hashSet, T item, Action<T> onAdd)
 		{
 			onAdd(item);
@@ -28,6 +29,10 @@ namespace Utils
 		{
 			hashSet.UnionWith(hashSetToAdd);
 		}
+		
+		#endregion
+
+		#region Dictionary
 
 		public static void AddToDictList<T,TK>(this IDictionary<T, List<TK>> dictionary, T key, TK item)
 		{
@@ -92,37 +97,21 @@ namespace Utils
 				}
 			}
 
-			foreach (var (key, bitangentIdx) in removals)
+			foreach (var (key, idx) in removals)
 			{
-				dictionary[key].RemoveAt(bitangentIdx);
+				dictionary[key].RemoveAt(idx);
 			}
 		}
 
-		public static Vector2 ToVec2(this Vector3 vec)
+		#endregion
+
+		#region Array
+
+		public static void ForEach<T>(this T[] array, Action<T> action)
 		{
-			return new Vector2(vec.x, vec.z);
-		}
-		
-		public static Vector3 ToVec3(this Vector2 vec, float height) => new Vector3(vec.x, height, vec.y);
-		
-	
-		public static Vector2 Rotate(this Vector2 v, float delta)
-		{
-			return new Vector2(
-				v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
-				v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
-			);
+			Array.ForEach(array, action);
 		}
 
-		public static float Cross(this Vector2 a, Vector2 b)
-		{
-			return a.x * b.y - b.y * a.x;
-		}
-
-		public static float ScaledRadius(this CapsuleCollider col)
-		{
-			var scale = Mathf.Max(col.gameObject.transform.localScale.x, col.gameObject.transform.localScale.z);
-			return col.radius * scale;
-		}
+		#endregion
 	}
 }

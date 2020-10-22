@@ -13,7 +13,7 @@ namespace Pathfinding
 		
 		private readonly SimplePriorityQueue<Node<T>> frontier = new SimplePriorityQueue<Node<T>>();
 		private readonly Dictionary<Node<T>, Node<T>> cameFrom = new Dictionary<Node<T>, Node<T>>();
-		private readonly Dictionary<Node<T>, int> costSoFar = new Dictionary<Node<T>, int>();
+		private readonly Dictionary<Node<T>, float> costSoFar = new Dictionary<Node<T>, float>();
 
 		private readonly IGraph<T> graph;
 

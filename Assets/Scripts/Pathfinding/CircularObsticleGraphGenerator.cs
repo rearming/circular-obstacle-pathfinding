@@ -6,14 +6,17 @@ using Utils;
 
 namespace Pathfinding
 {
-	public class CircularObsticleGraphGenerator<T> where T : IEquatable<T>
+	public class CircularObsticleGraphGenerator
 	{
-		private IGraph<T> graph;
+		public readonly Graph<Vector2> graph = new Graph<Vector2>();
 
 		public Dictionary<int, Circle> Circles { get; private set; }
 		
 		public Dictionary<int, List<Edge>> SurfingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
+		// key - GetCirclesHash(circle1, circle2) 
+		
 		public Dictionary<int, List<Vector2>> PointsOnCircle { get; private set; } = new Dictionary<int, List<Vector2>>();
+		// key - circle.GetHashCode()
 		public Dictionary<int, List<Edge>> HuggingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
 		// key - circle.GetHashCode()
 
@@ -25,6 +28,8 @@ namespace Pathfinding
 			SetCircles(circles);
 			Start = start;
 			Goal = goal;
+			
+			graph.SetContentEqualsComparer((v1, v2) => v1 == v2);
 		}
 		
 		private CircularObsticleGraphGenerator() { }
@@ -46,6 +51,28 @@ namespace Pathfinding
 				}
 			}
 			GetHuggingEdges();
+			GetGraph();
+		}
+
+		private void GetGraph()
+		{
+			graph.Clear();
+			foreach (var surfingEdgeList in SurfingEdges.Values)
+			{
+				foreach (var surfingEdge in surfingEdgeList)
+				{
+					graph.AddNode(surfingEdge.a);
+					graph.AddNode(surfingEdge.b);
+					graph.ConnectNodes(surfingEdge.a, surfingEdge.b, Vector2.Distance(surfingEdge.a, surfingEdge.b));
+				}
+			}
+			foreach (var huggingEdgeList in HuggingEdges.Values)
+			{
+				foreach (var huggingEdge in huggingEdgeList)
+				{
+					graph.ConnectNodes(huggingEdge.a, huggingEdge.b, Vector2.Distance(huggingEdge.a, huggingEdge.b));
+				}
+			}
 		}
 
 		#region Surging Edges Generation
@@ -137,17 +164,8 @@ namespace Pathfinding
 		private void GetHuggingEdges()
 		{
 			GetPointsOnCircle();
-			
-			HuggingEdges.Clear();
-			foreach (var pointsList in PointsOnCircle)
-			{
-				for (var i = 0; i < pointsList.Value.Count; i++)
-				{
-					HuggingEdges.AddToDictList(pointsList.Key,
-						new Edge(pointsList.Value[i], pointsList.Value[(i + 1) % pointsList.Value.Count]));
-					// add point and next point as hugging edge
-				}
-			}
+			GenerateHuggingEdges();
+			// ThrowHuggingEdgesOut(); since in our case obstacles don't overlap, we can skip this for now
 		}
 
 		private void GetPointsOnCircle()
@@ -173,6 +191,62 @@ namespace Pathfinding
 			PointsOnCircle = sortedPoints;
 		}
 
+		private void GenerateHuggingEdges()
+		{
+			HuggingEdges.Clear();
+			foreach (var pointsList in PointsOnCircle)
+			{
+				for (var i = 0; i < pointsList.Value.Count; i++)
+				{
+					HuggingEdges.AddToDictList(pointsList.Key,
+						new Edge(pointsList.Value[i], pointsList.Value[(i + 1) % pointsList.Value.Count]));
+					// add point and next point as hugging edge
+				}
+			}
+		}
+
+		private void ThrowHuggingEdgesOut()
+		{
+			foreach (var huggingEdge in HuggingEdges)
+			{
+				huggingEdge.Value.RemoveAll(edge => ThrowHuggingEdgeOut(huggingEdge.Key, edge));
+			}
+		}
+
+		private bool ThrowHuggingEdgeOut(int circleHash, Edge edge)
+		{
+			foreach (var circle in Circles)
+			{
+				if (circle.Key == circleHash) // if same circle - continue
+					continue;
+				var circle1 = Circles[circleHash];
+				var circle2 = Circles[circleHash];
+				var d = Vector2.Distance(circle1.center, circle2.center);
+				var a = circle1.radius * circle1.radius - circle2.radius * circle2.radius + d;
+				var thetaAngle = Mathf.Acos(a / circle1.radius);
+
+
+				var dir = (circle2.center - circle1.center).normalized * circle1.radius;
+
+				var E = dir.Rotate(thetaAngle);
+				var D = dir.Rotate(-thetaAngle);
+
+				E -= circle1.center;
+				D -= circle1.center;
+				var edgePoint1 = edge.a - circle1.center;
+				var edgePoint2 = edge.b - circle1.center;
+
+				// if (VectorPolarCompare(E, )) 
+				// {
+				// 	
+				// }
+				//
+
+				// compare vectors, if hugging edge vector within - return true
+			}
+			return false;
+		}
+
 		Comparer<Vector2> VectorPolarComparer(int circleKey)
 		{
 			var circle = Circles[circleKey];
@@ -182,25 +256,38 @@ namespace Pathfinding
 				a -= circle.center;
 				b -= circle.center;
 				
-				int Quad(Vector2 p)
-				{
-					if (p.x < 0 && p.y < 0) return 0;
-					if (p.x >= 0 && p.y < 0) return 1;
-					if (p.x >= 0 && p.y >= 0) return 2;
-					if (p.x < 0 && p.y >= 0) return 3;
-					return -1;
-				}
-
-				if (Quad(a) == Quad(b))
-					return a.x * b.y > a.y * b.x ? -1 : 1;
-				return Quad(a) < Quad(b) ? -1 : 1;
+				return VectorPolarCompare(a, b);
 			});
 		}
-		
-		
+
+		int VectorPolarCompare(Vector2 a, Vector2 b)
+		{
+			int Quad(Vector2 p)
+			{
+				if (p.x < 0 && p.y < 0) return 0;
+				if (p.x >= 0 && p.y < 0) return 1;
+				if (p.x >= 0 && p.y >= 0) return 2;
+				if (p.x < 0 && p.y >= 0) return 3;
+				return -1;
+			}
+
+			if (Quad(a) == Quad(b))
+				return a.x * b.y > a.y * b.x ? -1 : 1;
+			return Quad(a) < Quad(b) ? -1 : 1;
+		}
 	}
 
 	#region Helper Classes
+
+	public readonly struct GraphEdgeInfo
+	{
+		public readonly float angle;
+
+		public GraphEdgeInfo(float angle)
+		{
+			this.angle = angle;
+		}
+	}
 	
 	public readonly struct Edge
 	{
@@ -229,8 +316,8 @@ namespace Pathfinding
 		public override string ToString() => $"a: [{a.ToString()}], b: [{b.ToString()}]";
 
 		public override bool Equals(object obj) =>
-			obj is Edge bitangent && ((bitangent.a == a && bitangent.b == b) ||
-			                          (bitangent.a == b && bitangent.b == a));
+			obj is Edge bitangent && (bitangent.a == a && bitangent.b == b ||
+			                          bitangent.a == b && bitangent.b == a);
 
 		public override int GetHashCode() => unchecked(a.GetHashCode() + b.GetHashCode());
 	}

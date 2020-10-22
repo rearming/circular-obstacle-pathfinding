@@ -12,63 +12,95 @@ namespace Pathfinding
 	{
 		[SerializeField] private Transform circlesTParent;
 		private (Transform, CapsuleCollider) [] circlesObstacles;
-		
+
 		[SerializeField] private Transform start;
 		[SerializeField] private Transform goal;
 
+		private Circle[] circles;
+		private CircularObsticleGraphGenerator circularGenerator;
+
+		#region Debug Drawing Properties
+
+		[Header("Debug Draw")]
+		
 		[SerializeField] private float gizmosHeight = 1f;
 		
-		private Circle[] circles;
-		private CircularObsticleGraphGenerator<Vector2> CircularGenerator;
+		[SerializeField] private bool hideObstacles;
+		[SerializeField] private bool hideObstacleMeshRenderers;
 		
+		[Serializable]
+		private class GizmosDrawingProperty
+		{
+			public bool draw = true;
+			public Color color = Color.green;
+		}
 		
+		[SerializeField] private GizmosDrawingProperty gizmosSurfingEdges;
+		[SerializeField] private GizmosDrawingProperty gizmosHuggingEdges;
+		
+		[SerializeField] private bool drawSortedCirclePoints = true;
+		
+		[SerializeField] private GizmosDrawingProperty gizmosGraph;
+
+		private (Transform, Renderer)[] circlesDebug;
+
+		#endregion
 
 		private void Start()
+		{
+			GetObsticles();
+			GetCircles();
+			
+			circularGenerator = new CircularObsticleGraphGenerator(circles, start.position.ToVec2(), goal.position.ToVec2());
+			
+			circularGenerator.GenerateGraph();
+		}
+
+		private void Update()
+		{
+			GetCircles();
+			circularGenerator.SetCircles(circles);
+			circularGenerator.GenerateGraph();
+			
+			ToggleObsticlesVisibility();
+		}
+
+		private void GetObsticles()
 		{
 			circlesObstacles = circlesTParent.GetComponentsInChildren<CapsuleCollider>()
 				.Where(cc => cc.gameObject.activeSelf)
 				.Select(cc => (cc.gameObject.transform, cc))
 				.ToArray();
 			
-			GetCircles();
-			
-			CircularGenerator = new CircularObsticleGraphGenerator<Vector2>(circles, start.position.ToVec2(), goal.position.ToVec2());
-			
-			CircularGenerator.GenerateGraph();
-			
+			circlesDebug = circlesTParent.GetComponentsInChildren<CapsuleCollider>()
+				.Where(cc => cc.gameObject.activeSelf)
+				.Select(cc => (cc.gameObject.transform, cc.gameObject.GetComponent<Renderer>()))
+				.ToArray();
 		}
-
-		private void Update()
+		
+		private void GetCircles()
 		{
-			GetCircles();
-			CircularGenerator.SetCircles(circles);
-			CircularGenerator.GenerateGraph();
+			circles = circlesObstacles.Select(t => new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2())).ToArray();
 		}
-
-		private void PrintPointsOnCircle()
-		{
-			Debug.Log($"points on circle count: [{CircularGenerator.PointsOnCircle.Count.ToString()}]");
-			CircularGenerator.PointsOnCircle.ForEachDictListElem((circleHash, point) =>
-			{
-				Debug.Log($"circle hash: [{circleHash.ToString()}], point: [{point.ToString()}]");
-			});
-		}
+		
+		#region Debug Drawing
 
 		private void OnDrawGizmos()
 		{
 			if (!Application.isPlaying)
 				return;
 			
-			DrawSurfingEdges();
-			DrawSortedCirclePoints();
-			DrawHuggingEdges();
+			if (gizmosSurfingEdges.draw) DrawSurfingEdges();
+			if (gizmosHuggingEdges.draw) DrawHuggingEdges();
+			if (drawSortedCirclePoints) DrawSortedCirclePoints();
+			if (gizmosGraph.draw) DrawGraph();
 		}
 
 		private void DrawSurfingEdges()
 		{
-			CircularGenerator.SurfingEdges.ForEachDictListElem((_, edge) =>
+			circularGenerator.SurfingEdges.ForEachDictListElem((_, edge) =>
 			{
-				Gizmos.color = Color.green;
+				Gizmos.color = gizmosSurfingEdges.color;
 				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
 				Gizmos.color = Color.yellow;
 				Gizmos.DrawSphere(edge.a.ToVec3(gizmosHeight), 0.04f);
@@ -76,47 +108,47 @@ namespace Pathfinding
 			});
 		}
 
+		private void DrawHuggingEdges()
+		{
+			circularGenerator.HuggingEdges.ForEachDictListElem(edge =>
+			{
+				Gizmos.color = gizmosHuggingEdges.color;
+				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
+			});
+		}
+
 		private void DrawSortedCirclePoints()
 		{
-			CircularGenerator.PointsOnCircle.ForEachDictList((circleHash, pointList) =>
+			circularGenerator.PointsOnCircle.ForEachDictList((circleHash, pointList) =>
 			{
 				for (var i = 0; i < pointList.Count; i++)
 				{
 					var t = pointList.Count > 1 ? (float) i / (pointList.Count - 1) : 0;
-					var center = CircularGenerator.Circles[circleHash].center.ToVec3(gizmosHeight);
+					var center = circularGenerator.Circles[circleHash].center.ToVec3(gizmosHeight);
 					Gizmos.color = Color.Lerp(Color.red, Color.blue, t);
 					Gizmos.DrawLine(center, Vector3.Lerp(center, pointList[i].ToVec3(gizmosHeight), Mathf.Lerp(0.5f, 1f, t)));
 				}
 			});
 		}
 
-		private void DrawHuggingEdges()
+		private void DrawGraph()
 		{
-			CircularGenerator.HuggingEdges.ForEachDictListElem(edge =>
+			Gizmos.color = gizmosGraph.color;
+			foreach (var node in circularGenerator.graph)
 			{
-				Gizmos.color = ColorUtility.TryParseHtmlString("#a200cf", out var color) ? color : Color.blue;
-				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
-			});
+				foreach (var connectedNode in node.Links)
+				{
+					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.Node.Content.ToVec3(gizmosHeight));
+				}
+			}
 		}
 
-		private void OnEnable()
+		private void ToggleObsticlesVisibility()
 		{
-			SceneView.duringSceneGui += SceneUpdate;
-		}
-
-		private void SceneUpdate(SceneView sceneView)
-		{
-			// Handles.DrawBezier(Vector3.zero, Vector3.up, Vector3.right, 145, 2);
+			circlesDebug.ForEach(tcc => tcc.Item1.gameObject.SetActive(!hideObstacles));
+			circlesDebug.ForEach(tcc => tcc.Item2.enabled = !hideObstacleMeshRenderers);
 		}
 		
-		private void OnDisable()
-		{
-			SceneView.duringSceneGui -= SceneUpdate;
-		}
-
-		private void GetCircles()
-		{
-			circles = circlesObstacles.Select(t => new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2())).ToArray();
-		}
+		#endregion
 	}
 }
