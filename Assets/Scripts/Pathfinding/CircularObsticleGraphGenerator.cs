@@ -22,6 +22,11 @@ namespace Pathfinding
 
 		public Vector2 Start { get; private set; }
 		public Vector2 Goal { get; private set; }
+
+		/// <summary>
+		/// Nodes closer than that distance will be considered as one same node 
+		/// </summary>
+		private float DistanceTolerance { get; set; } = 0.05f;
 		
 		public CircularObsticleGraphGenerator(IEnumerable<Circle> circles, Vector2 start, Vector2 goal)
 		{
@@ -39,7 +44,7 @@ namespace Pathfinding
 
 		private void AddPointToCircles(Vector2 point)
 		{
-			var circle = new Circle(0.05f, point);
+			var circle = new Circle(DistanceTolerance / 3f, point);
 			Circles.Add(circle.GetHashCode(), circle);
 		}
 
@@ -73,6 +78,8 @@ namespace Pathfinding
 			{
 				foreach (var surfingEdge in surfingEdgeList)
 				{
+					if (Vector2.Distance(surfingEdge.a, surfingEdge.b) <= DistanceTolerance)
+						continue;
 					graph.AddNode(surfingEdge.a);
 					graph.AddNode(surfingEdge.b);
 					graph.ConnectNodes(surfingEdge.a, surfingEdge.b, Vector2.Distance(surfingEdge.a, surfingEdge.b));
@@ -82,6 +89,8 @@ namespace Pathfinding
 			{
 				foreach (var huggingEdge in huggingEdgeList)
 				{
+					if (Vector2.Distance(huggingEdge.a, huggingEdge.b) <= DistanceTolerance)
+						continue;
 					graph.ConnectNodes(huggingEdge.a, huggingEdge.b, Vector2.Distance(huggingEdge.a, huggingEdge.b));
 				}
 			}

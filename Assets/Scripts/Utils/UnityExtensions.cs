@@ -40,9 +40,14 @@ namespace Utils
 		/// <param name="v2"></param>
 		/// <param name="tolerance"></param>
 		/// <returns></returns>
-		public static bool AlmostEqual(this in Vector2 v1, in Vector2 v2, float tolerance)
+		public static bool AlmostEqual(this in Vector2 v1, in Vector2 v2, in float tolerance)
 		{
 			return Vector2.SqrMagnitude(v1 - v2) < tolerance;
+		}
+
+		public static bool AlmostEqual(this in float a, in float b, in float tolerance)
+		{
+			return Math.Abs(a - b) < tolerance;
 		}
 	}
 }

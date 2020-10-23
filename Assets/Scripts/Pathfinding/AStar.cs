@@ -49,6 +49,7 @@ namespace Pathfinding
 			frontier.Clear();
 			cameFrom.Clear();
 			costSoFar.Clear();
+			graph.CleanupDisconnectedNodes();
 		}
 		
 		public void FindPath()

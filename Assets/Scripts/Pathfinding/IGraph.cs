@@ -9,6 +9,10 @@ namespace Pathfinding
 		void RemoveNode(Node<T> n);
 		void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1);
 		void ConnectAllNodes(Action<Node<T>> connectorFunc);
+		/// <summary>
+		/// Removes all nodes with 0 links to others.
+		/// </summary>
+		void CleanupDisconnectedNodes();
 
 		void SetContentEqualsComparer(Func<T, T, bool> comparer);
 		void Clear();

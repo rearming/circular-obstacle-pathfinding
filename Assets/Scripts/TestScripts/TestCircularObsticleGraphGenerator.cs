@@ -55,7 +55,7 @@ namespace Pathfinding
 			GetCircles();
 			
 			circularGenerator = new CircularObsticleGraphGenerator();
-			circularGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.01f));
+			circularGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.1f));
 			pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.ManhattanDistance);
 		}
 
@@ -147,9 +147,9 @@ namespace Pathfinding
 			Gizmos.color = gizmosGraph.color;
 			foreach (var node in circularGenerator.graph)
 			{
-				foreach (var connectedNode in node.Links)
+				foreach (var connectedNode in node.links)
 				{
-					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.Node.Content.ToVec3(gizmosHeight));
+					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.node.Content.ToVec3(gizmosHeight));
 				}
 			}
 		}
