@@ -32,5 +32,17 @@ namespace Utils
 			var scale = Mathf.Max(col.gameObject.transform.localScale.x, col.gameObject.transform.localScale.z);
 			return col.radius * scale;
 		}
+		
+		/// <summary>
+		/// In fact, tolerance == sqrt(tolerance)
+		/// </summary>
+		/// <param name="v1"></param>
+		/// <param name="v2"></param>
+		/// <param name="tolerance"></param>
+		/// <returns></returns>
+		public static bool AlmostEqual(this in Vector2 v1, in Vector2 v2, float tolerance)
+		{
+			return Vector2.SqrMagnitude(v1 - v2) < tolerance;
+		}
 	}
 }

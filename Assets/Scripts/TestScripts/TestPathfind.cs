@@ -96,14 +96,7 @@ namespace Pathfinding
 
 		private void PathfindTest()
 		{
-			var AStar = new AStar<Vector2Int>(graph, (goal, next) =>
-			{
-				// Manhattan Distance heuristic
-				var D = 1f;
-				var dx = Mathf.Abs(next.Content.x - goal.Content.x);
-				var dy = Mathf.Abs(next.Content.y - goal.Content.y);
-				return (int)(D * dx * dy);
-			});
+			var AStar = new AStar<Vector2Int>(graph, AStarHeuristic<Vector2Int>.ManhattanDistanceInt);
 			
 			AStar.SetGoal(endNode);
 			AStar.SetStart(startNode);

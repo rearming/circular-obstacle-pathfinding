@@ -25,18 +25,30 @@ namespace Pathfinding
 		
 		public CircularObsticleGraphGenerator(IEnumerable<Circle> circles, Vector2 start, Vector2 goal)
 		{
+			SetStart(start);
+			SetGoal(goal);
+			
 			SetCircles(circles);
-			Start = start;
-			Goal = goal;
 			
 			graph.SetContentEqualsComparer((v1, v2) => v1 == v2);
 		}
-		
-		private CircularObsticleGraphGenerator() { }
 
 		public void SetStart(Vector2 start) => Start = start;
-		public void SetCircles(IEnumerable<Circle> c) => Circles = c.ToDictionary(cr => cr.GetHashCode());
+
 		public void SetGoal(Vector2 goal) => Goal = goal;
+
+		private void AddPointToCircles(Vector2 point)
+		{
+			var circle = new Circle(0.05f, point);
+			Circles.Add(circle.GetHashCode(), circle);
+		}
+
+		public void SetCircles(IEnumerable<Circle> c)
+		{
+			Circles = c.ToDictionary(cr => cr.GetHashCode());
+			AddPointToCircles(Start);
+			AddPointToCircles(Goal);
+		}
 
 		public void GenerateGraph()
 		{
@@ -76,7 +88,7 @@ namespace Pathfinding
 		}
 
 		#region Surging Edges Generation
-		
+
 		private void GetSurfingEdges(Circle circle1, Circle circle2)
 		{
 			if (SurfingEdges.ContainsKey(GetCirclesHash(circle1, circle2)))
@@ -143,7 +155,7 @@ namespace Pathfinding
 				});
 			}
 		}
-		
+
 		#endregion
 
 		#region Edge Utils
@@ -153,7 +165,7 @@ namespace Pathfinding
 			if (!edges.ContainsKey(key))
 				edges.Add(key, newEdges);
 		}
-		
+
 		private int GetCirclesHash(Circle circle1, Circle circle2)
 		{
 			return unchecked(circle1.GetHashCode() + circle2.GetHashCode());
@@ -275,6 +287,8 @@ namespace Pathfinding
 				return a.x * b.y > a.y * b.x ? -1 : 1;
 			return Quad(a) < Quad(b) ? -1 : 1;
 		}
+
+		public CircularObsticleGraphGenerator() { }
 	}
 
 	#region Helper Classes

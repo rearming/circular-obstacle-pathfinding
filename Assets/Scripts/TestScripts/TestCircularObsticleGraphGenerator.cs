@@ -18,7 +18,10 @@ namespace Pathfinding
 
 		private Circle[] circles;
 		private CircularObsticleGraphGenerator circularGenerator;
+		private AStar<Vector2> pathfinder;
 
+		private List<Node<Vector2>> path;
+		
 		#region Debug Drawing Properties
 
 		[Header("Debug Draw")]
@@ -37,10 +40,10 @@ namespace Pathfinding
 		
 		[SerializeField] private GizmosDrawingProperty gizmosSurfingEdges;
 		[SerializeField] private GizmosDrawingProperty gizmosHuggingEdges;
+		[SerializeField] private GizmosDrawingProperty gizmosGraph;
+		[SerializeField] private GizmosDrawingProperty gizmosPath;
 		
 		[SerializeField] private bool drawSortedCirclePoints = true;
-		
-		[SerializeField] private GizmosDrawingProperty gizmosGraph;
 
 		private (Transform, Renderer)[] circlesDebug;
 
@@ -51,16 +54,23 @@ namespace Pathfinding
 			GetObsticles();
 			GetCircles();
 			
-			circularGenerator = new CircularObsticleGraphGenerator(circles, start.position.ToVec2(), goal.position.ToVec2());
-			
-			circularGenerator.GenerateGraph();
+			circularGenerator = new CircularObsticleGraphGenerator();
+			circularGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.01f));
+			pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.ManhattanDistance);
 		}
 
 		private void Update()
 		{
 			GetCircles();
+			circularGenerator.SetStart(start.position.ToVec2());
+			circularGenerator.SetGoal(goal.position.ToVec2());
 			circularGenerator.SetCircles(circles);
 			circularGenerator.GenerateGraph();
+			
+			pathfinder.SetStart(circularGenerator.Start);
+			pathfinder.SetGoal(circularGenerator.Goal);
+			pathfinder.FindPath();
+			path = pathfinder.GetPath();
 			
 			ToggleObsticlesVisibility();
 		}
@@ -94,6 +104,7 @@ namespace Pathfinding
 			if (gizmosHuggingEdges.draw) DrawHuggingEdges();
 			if (drawSortedCirclePoints) DrawSortedCirclePoints();
 			if (gizmosGraph.draw) DrawGraph();
+			if (gizmosPath.draw) DrawPath();
 		}
 
 		private void DrawSurfingEdges()
@@ -140,6 +151,18 @@ namespace Pathfinding
 				{
 					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.Node.Content.ToVec3(gizmosHeight));
 				}
+			}
+		}
+
+		private void DrawPath()
+		{
+			if (path == null) return;
+			
+			Gizmos.color = gizmosPath.color;
+
+			for (int i = 1; i < path.Count; i++)
+			{
+				Gizmos.DrawLine(path[i - 1].Content.ToVec3(gizmosHeight), path[i].Content.ToVec3(gizmosHeight));
 			}
 		}
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Priority_Queue;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Pathfinding
 	{
 		private Node<T> start;
 		private Node<T> goal;
-		private readonly Func<Node<T>, Node<T>, int> heuristic;
+		private AStarHeuristic<T> heuristic;
 		
 		private readonly SimplePriorityQueue<Node<T>> frontier = new SimplePriorityQueue<Node<T>>();
 		private readonly Dictionary<Node<T>, Node<T>> cameFrom = new Dictionary<Node<T>, Node<T>>();
@@ -17,7 +18,7 @@ namespace Pathfinding
 
 		private readonly IGraph<T> graph;
 
-		public AStar(IGraph<T> graph, Func<Node<T>, Node<T>, int> heuristic)
+		public AStar(IGraph<T> graph, AStarHeuristic<T> heuristic)
 		{
 			this.graph = graph;
 			this.heuristic = heuristic;
@@ -40,9 +41,20 @@ namespace Pathfinding
 				Debug.LogError($"[{nameof(AStar<T>)}] There is no goal [{g}] node in the graph.");
 			}
 		}
+
+		public void SetHeuristic(AStarHeuristic<T> h) => heuristic = h;
+
+		private void Cleanup()
+		{
+			frontier.Clear();
+			cameFrom.Clear();
+			costSoFar.Clear();
+		}
 		
 		public void FindPath()
 		{
+			Cleanup();
+			
 			frontier.Enqueue(start, 0);
 			cameFrom[start] = null;
 			costSoFar[start] = 0;
@@ -59,7 +71,7 @@ namespace Pathfinding
 					if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
 					{
 						costSoFar[next] = newCost;
-						var priority = newCost + heuristic(goal, next);
+						var priority = newCost + heuristic.func(goal, next);
 						frontier.Enqueue(next, priority);
 						cameFrom[next] = current;
 					}
@@ -86,5 +98,36 @@ namespace Pathfinding
 			path.Reverse();
 			return path;
 		}
+	}
+
+	public class AStarHeuristic<T> where T : IEquatable<T>
+	{
+
+		public readonly Func<Node<T>, Node<T>, float> func;
+		
+		public AStarHeuristic(Func<Node<T>, Node<T>, float> heuristic)
+		{
+			func = heuristic;
+		}
+
+		public static AStarHeuristic<Vector2> ManhattanDistance => new AStarHeuristic<Vector2>((goal, next) =>
+		{
+			const float D = 1f;
+			var dx = Mathf.Abs(next.Content.x - goal.Content.x);
+			var dy = Mathf.Abs(next.Content.y - goal.Content.y);
+			return D * dx * dy;
+		});
+		
+		public static AStarHeuristic<Vector2Int> ManhattanDistanceInt => new AStarHeuristic<Vector2Int>((goal, next) =>
+		{
+			const float D = 1f;
+			var dx = Mathf.Abs(next.Content.x - goal.Content.x);
+			var dy = Mathf.Abs(next.Content.y - goal.Content.y);
+			return D * dx * dy;
+		});
+		
+		public static implicit operator Func<Node<T>, Node<T>, float> (AStarHeuristic<T> heuristic) => heuristic.func;
+		
+		private AStarHeuristic() { }
 	}
 }

@@ -421,7 +421,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 336507302}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.63, y: -4.64, z: -9.25}
+  m_LocalPosition: {x: -2.06, y: -4.64, z: -11.22}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 2073769125}
@@ -1198,7 +1198,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1379870041}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.75, y: -4.64, z: -6.27}
+  m_LocalPosition: {x: 8.94, y: -4.64, z: -5.08}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 2073769125}
@@ -1636,15 +1636,18 @@ MonoBehaviour:
   hideObstacles: 0
   hideObstacleMeshRenderers: 0
   gizmosSurfingEdges:
-    draw: 1
+    draw: 0
     color: {r: 0, g: 0.7264151, b: 0, a: 1}
   gizmosHuggingEdges:
-    draw: 1
+    draw: 0
     color: {r: 0.9150943, g: 0, b: 0.34600538, a: 1}
-  drawSortedCirclePoints: 0
   gizmosGraph:
     draw: 1
     color: {r: 1, g: 0.44145525, b: 0, a: 1}
+  gizmosPath:
+    draw: 1
+    color: {r: 1, g: 0.018845517, b: 0, a: 1}
+  drawSortedCirclePoints: 0
 --- !u!4 &2073769125
 Transform:
   m_ObjectHideFlags: 0
