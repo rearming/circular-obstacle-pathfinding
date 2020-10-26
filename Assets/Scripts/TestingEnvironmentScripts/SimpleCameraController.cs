@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace UnityTemplateProjects
+namespace TestingEnvironmentScripts
 {
     public class SimpleCameraController : MonoBehaviour
     {

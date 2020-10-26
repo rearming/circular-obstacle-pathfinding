@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UnityTemplateProjects.ScriptableObjects
+namespace ScriptableObjects
 {
 	[CreateAssetMenu(fileName = "MovementSpec_1", menuName = "Specs/Movement Spec", order = 0)]
 	public class MovementSpec : ScriptableObject

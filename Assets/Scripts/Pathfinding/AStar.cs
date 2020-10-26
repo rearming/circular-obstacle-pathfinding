@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using Priority_Queue;
+using Pathfinding.Graph;
+using Plugins.Priority_Queue;
 using UnityEngine;
 
 namespace Pathfinding

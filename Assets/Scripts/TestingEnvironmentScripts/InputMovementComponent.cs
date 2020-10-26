@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace UnityTemplateProjects
+namespace TestingEnvironmentScripts
 {
 	public class InputMovementComponent : MonoBehaviour
 	{

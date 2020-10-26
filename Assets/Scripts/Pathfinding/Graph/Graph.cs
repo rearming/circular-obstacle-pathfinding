@@ -2,25 +2,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
-using UnityEngine;
-using Utils;
-using Object = System.Object;
 
-namespace Pathfinding
+namespace Pathfinding.Graph
 {
 	public class Graph<T> : IGraph<T> where T : IEquatable<T>
 	{
 		private List<Node<T>> Nodes = new List<Node<T>>();
-		private Func<T, T, bool> contentEqualsComparerFunc;
-		private ContentEqualityComparer comparer;
 
-		public Graph()
+		private Func<T, T, bool> contentEqualsComparerFunc;
+		private Func<T, T, bool> ContentEqualsComparerFunc
 		{
-			comparer = new ContentEqualityComparer(contentEqualsComparerFunc);
+			get => contentEqualsComparerFunc;
+			set
+			{
+				comparer = new ContentEqualityComparer(contentEqualsComparerFunc);
+				contentEqualsComparerFunc = value;
+			}
 		}
 
-		public void SetContentEqualsComparer(Func<T, T, bool> c) => contentEqualsComparerFunc = c;
+		private ContentEqualityComparer comparer; // for collections that require IEqualityComparer (for ex. HashSet)
+
+		public Graph() { }
+
+		public void SetContentEqualsComparer(Func<T, T, bool> c) => ContentEqualsComparerFunc = c;
 
 		public void AddNode(Node<T> n)
 		{
@@ -33,7 +37,7 @@ namespace Pathfinding
 			{
 				node.links.RemoveAt(node.links.FindIndex(nwe => nwe.node == n));
 			}
-			Nodes.Remove(n);
+			Nodes.Remove(n); // then remove node itself
 		}
 
 		public void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1)
@@ -85,9 +89,9 @@ namespace Pathfinding
 
 		private bool NodesEquals(Node<T> node1, Node<T> node2)
 		{
-			if (contentEqualsComparerFunc == null)
+			if (ContentEqualsComparerFunc == null)
 				return node1.Content.Equals(node2.Content);
-			return contentEqualsComparerFunc(node1.Content, node2.Content);
+			return ContentEqualsComparerFunc(node1.Content, node2.Content);
 		}
 
 		private bool NodesWithEdgesEquals(NodeWithEdge<T> nwe1, NodeWithEdge<T> nwe2)
@@ -123,68 +127,6 @@ namespace Pathfinding
 			{
 				return obj.Content.GetHashCode();
 			}
-		}
-	}
-
-	public class Node<T> where T : IEquatable<T>
-	{
-		public T Content { get; }
-		
-		public readonly List<NodeWithEdge<T>> links;
-
-		public Node(T content)
-		{
-			links = new List<NodeWithEdge<T>>();
-			this.Content = content;
-		}
-
-		public static implicit operator Node<T>(T cont) => new Node<T>(cont);
-
-		public override string ToString() => Content.ToString();
-		
-		// public static bool operator ==(Node<T> node1, Node<T> node2)
-		// {
-		// 	return true;
-		// }
-		//
-		// public static bool operator !=(Node<T> node1, Node<T> node2)
-		// {
-		// 	return !(node1 == node2);
-		// }
-		//
-		public override bool Equals(object obj) => Content.Equals(((Node<T>) obj).Content);
-		
-		public override int GetHashCode() => Content.GetHashCode();
-	}
-
-	public class NodeWithEdge<T> where T : IEquatable<T>
-	{
-		public readonly GraphEdge graphEdge;
-		public readonly Node<T> node;
-
-		public NodeWithEdge(Node<T> node, float cost)
-		{
-			graphEdge = new GraphEdge(cost);
-			this.node = node;
-		}
-	}
-
-	public readonly struct GraphEdge
-	{
-		public readonly float cost;
-
-		public GraphEdge(float cost) => this.cost = cost;
-		
-		public static implicit operator GraphEdge(float cost) => new GraphEdge(cost);
-
-		public static bool operator ==(GraphEdge edge1, GraphEdge edge2)
-		{
-			return edge1.cost.AlmostEqual(edge2.cost, 0.05f);
-		}
-
-		public static bool operator !=(GraphEdge edge1, GraphEdge edge2)
-		{
-			return !(edge1 == edge2);
 		}
 	}
 }

@@ -1,6 +1,7 @@
+using Pathfinding.Graph;
 using UnityEngine;
 
-namespace Pathfinding
+namespace TestScripts
 {
 	public class TestSimpleGridGraph : MonoBehaviour
 	{

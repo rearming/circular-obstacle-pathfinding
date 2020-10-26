@@ -34,7 +34,7 @@ namespace Utils
 		}
 		
 		/// <summary>
-		/// In fact, tolerance == sqrt(tolerance)
+		/// In fact, tolerance == sqrt(provided tolerance)
 		/// </summary>
 		/// <param name="v1"></param>
 		/// <param name="v2"></param>

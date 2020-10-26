@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Pathfinding
+namespace Pathfinding.Graph
 {         
 	public interface IGraph<T> : IEnumerable<Node<T>> where T : IEquatable<T>
 	{

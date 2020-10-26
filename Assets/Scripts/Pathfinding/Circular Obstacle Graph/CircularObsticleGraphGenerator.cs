@@ -1,16 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pathfinding.Graph;
 using UnityEngine;
 using Utils;
 
-namespace Pathfinding
+namespace Pathfinding.Circular_Obstacle_Graph
 {
 	public class CircularObsticleGraphGenerator
 	{
 		public readonly Graph<Vector2> graph = new Graph<Vector2>();
 
 		public Dictionary<int, Circle> Circles { get; private set; }
+		// key - circle.GetHashCode()
 		
 		public Dictionary<int, List<Edge>> SurfingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
 		// key - GetCirclesHash(circle1, circle2) 
@@ -182,6 +183,8 @@ namespace Pathfinding
 
 		#endregion
 
+		#region Hugging Edges Generation
+
 		private void GetHuggingEdges()
 		{
 			GetPointsOnCircle();
@@ -297,97 +300,9 @@ namespace Pathfinding
 			return Quad(a) < Quad(b) ? -1 : 1;
 		}
 
+		#endregion
+		
 		public CircularObsticleGraphGenerator() { }
 	}
 
-	#region Helper Classes
-
-	public readonly struct GraphEdgeInfo
-	{
-		public readonly float angle;
-
-		public GraphEdgeInfo(float angle)
-		{
-			this.angle = angle;
-		}
-	}
-	
-	public readonly struct Edge
-	{
-		public readonly Vector2 a;
-		public readonly Vector2 b;
-
-		public readonly int circleAhash;
-		public readonly int circleBhash;
-
-		public Edge(Vector2 a, Vector2 b, int circleAhash, int circleBhash)
-		{
-			this.a = a;
-			this.b = b;
-			this.circleAhash = circleAhash;
-			this.circleBhash = circleBhash;
-		}
-		
-		public Edge(Vector2 a, Vector2 b)
-		{
-			this.a = a;
-			this.b = b;
-			circleAhash = -1;
-			circleBhash = -1;
-		}
-
-		public override string ToString() => $"a: [{a.ToString()}], b: [{b.ToString()}]";
-
-		public override bool Equals(object obj) =>
-			obj is Edge bitangent && (bitangent.a == a && bitangent.b == b ||
-			                          bitangent.a == b && bitangent.b == a);
-
-		public override int GetHashCode() => unchecked(a.GetHashCode() + b.GetHashCode());
-	}
-
-	public readonly struct Circle
-	{
-		public readonly float radius;
-		public readonly Vector2 center;
-
-		public Circle(float radius, Vector2 center)
-		{
-			this.radius = radius;
-			this.center = center;
-		}
-
-		public bool Overlaps(Circle circle2)
-		{
-			var a = radius + circle2.radius;
-			var dx = center.x - circle2.center.x;
-			var dy = center.y - circle2.center.y;
-			return a * a > dx * dx + dy * dy;
-		}
-
-		public bool Contains(Circle circle2)
-		{
-			var d = Mathf.Sqrt(
-				circle2.center.x - center.x * circle2.center.x - center.x +
-				circle2.center.y - center.y * circle2.center.y - center.y);
-			return radius > d + circle2.radius;
-		}
-
-		public static bool operator ==(Circle c1, Circle c2) =>
-			c1.center == c2.center && Math.Abs(c1.radius - c2.radius) < 0.001f;
-
-		public static bool operator !=(Circle c1, Circle c2) => !(c1 == c2);
-
-		public override string ToString()
-		{
-			return $"Radius: [{radius.ToString()}], Center: [{center.ToString()}]";
-		}
-
-		public override bool Equals(object obj) => 
-			obj is Circle circle && circle.center == center && Math.Abs(circle.radius - radius) < 0.001f;
-
-		public override int GetHashCode() => new {Center = center, Radius = radius}.GetHashCode();
-	}
-	
-	#endregion
-	
 }

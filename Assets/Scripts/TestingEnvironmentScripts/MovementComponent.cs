@@ -1,16 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using ScriptableObjects;
 using UnityEngine;
-using UnityTemplateProjects.ScriptableObjects;
 
-public class MovementComponent : MonoBehaviour
+namespace TestingEnvironmentScripts
 {
-    [SerializeField] private MovementSpec movementSpec;
-    
-    public Vector2 MovementDir { get; set; }
-    
-    void Update()
+    public class MovementComponent : MonoBehaviour
     {
-        transform.position += new Vector3(MovementDir.x, 0, MovementDir.y) * (movementSpec.Speed * Time.deltaTime);
+        [SerializeField] private MovementSpec movementSpec;
+    
+        public Vector2 MovementDir { get; set; }
+    
+        void Update()
+        {
+            transform.position += new Vector3(MovementDir.x, 0, MovementDir.y) * (movementSpec.Speed * Time.deltaTime);
+        }
     }
 }

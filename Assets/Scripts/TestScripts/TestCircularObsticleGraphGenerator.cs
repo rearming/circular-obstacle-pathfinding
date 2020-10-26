@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+using Pathfinding;
+using Pathfinding.Circular_Obstacle_Graph;
+using Pathfinding.Graph;
 using UnityEngine;
 using Utils;
-using Random = System.Random;
 
-namespace Pathfinding
+namespace TestScripts
 {
 	public class TestCircularObsticleGraphGenerator : MonoBehaviour
 	{
@@ -45,10 +46,8 @@ namespace Pathfinding
 		
 		[SerializeField] private bool drawSortedCirclePoints = true;
 
-		[Header("Debug Data")]
-		
-		[SerializeField] private float pathCost;
-		
+		// [Header("Debug Data")]
+
 		private (Transform, Renderer)[] circlesDebug;
 
 		#endregion
@@ -166,11 +165,9 @@ namespace Pathfinding
 				return;
 			
 			Gizmos.color = gizmosPath.color;
-
-			pathCost = 0f;
+			
 			for (int i = 1; i < path.Count; i++)
 			{
-				pathCost += circularGenerator.graph.Cost(path[i - 1], path[i]);
 				Gizmos.DrawLine(path[i - 1].Content.ToVec3(gizmosHeight), path[i].Content.ToVec3(gizmosHeight));
 			}
 		}

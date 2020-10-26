@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using Utils;
 
-namespace UnityTemplateProjects
+namespace TestingEnvironmentScripts
 {
 	public class NeutralComponent : MonoBehaviour
 	{

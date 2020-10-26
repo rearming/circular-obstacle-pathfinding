@@ -1,4 +1,4 @@
-﻿namespace Priority_Queue
+﻿namespace Plugins.Priority_Queue
 {
     public class StablePriorityQueueNode : FastPriorityQueueNode
     {
