@@ -110,7 +110,15 @@ namespace Pathfinding
 			func = heuristic;
 		}
 		
-		public static AStarHeuristic<Vector2> DijkstraHeuristic => new AStarHeuristic<Vector2>(((goal, next) => 0f));
+		public static AStarHeuristic<Vector2> DijkstraHeuristic => new AStarHeuristic<Vector2>((goal, next) => 0f);
+		
+		public static AStarHeuristic<Vector2> EuclideanDistance => new AStarHeuristic<Vector2>((goal, next) =>
+		{
+			const float D = 1f;
+			var dx = Mathf.Abs(next.Content.x - goal.Content.x);
+			var dy = Mathf.Abs(next.Content.y - goal.Content.y);
+			return D * Mathf.Sqrt(dx * dx + dy * dy);
+		});
 		
 		public static AStarHeuristic<Vector2> ManhattanDistance => new AStarHeuristic<Vector2>((goal, next) =>
 		{
@@ -119,7 +127,6 @@ namespace Pathfinding
 			var dy = Mathf.Abs(next.Content.y - goal.Content.y);
 			return D * dx * dy;
 		});
-		
 		public static AStarHeuristic<Vector2Int> ManhattanDistanceInt => new AStarHeuristic<Vector2Int>((goal, next) =>
 		{
 			const float D = 1f;

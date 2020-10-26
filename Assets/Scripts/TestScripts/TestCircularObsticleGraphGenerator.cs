@@ -61,7 +61,8 @@ namespace Pathfinding
 			circularGenerator = new CircularObsticleGraphGenerator();
 			circularGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.1f));
 			// pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.ManhattanDistance);
-			pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.DijkstraHeuristic);
+			// pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.DijkstraHeuristic);
+			pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.EuclideanDistance);
 		}
 
 		private void Update()
