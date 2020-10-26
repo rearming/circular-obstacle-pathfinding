@@ -19,16 +19,6 @@ namespace Pathfinding.Graph
 
 		public override string ToString() => Content.ToString();
 		
-		// public static bool operator ==(Node<T> node1, Node<T> node2)
-		// {
-		// 	return true;
-		// }
-		//
-		// public static bool operator !=(Node<T> node1, Node<T> node2)
-		// {
-		// 	return !(node1 == node2);
-		// }
-		//
 		public override bool Equals(object obj) => Content.Equals(((Node<T>) obj).Content);
 		
 		public override int GetHashCode() => Content.GetHashCode();

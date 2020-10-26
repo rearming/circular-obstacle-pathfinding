@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Pathfinding.Circular_Obstacle_Graph;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
 
 namespace TestingEnvironmentScripts
@@ -16,11 +20,11 @@ namespace TestingEnvironmentScripts
 
 		[SerializeField] private MouseButton selectButton;
 		[SerializeField] private MouseButton moveButton;
-		[SerializeField] private KeyCode stopMovement = KeyCode.Space;
+		[SerializeField] private KeyCode toggleStopMovement = KeyCode.Space;
 
 		private Camera cam;
-
-		private NeutralComponent[] allNeutrals;
+		
+		private (NeutralComponent, CircularPathfinderComponent) [] allNeutrals;
 		private readonly HashSet<NeutralComponent> selectedNeutrals = new HashSet<NeutralComponent>();
 
 		private void Awake()
@@ -30,7 +34,10 @@ namespace TestingEnvironmentScripts
 
 		private void Start()
 		{
-			allNeutrals = FindObjectsOfType<NeutralComponent>();
+			allNeutrals = FindObjectsOfType<NeutralComponent>()
+				.Select(nc => (nc, nc.GetComponent<CircularPathfinderComponent>()))
+				.ToArray();
+			StartCoroutine(ToggleStopNeutrals());
 		}
 
 		private void Update()
@@ -39,8 +46,6 @@ namespace TestingEnvironmentScripts
 				SelectNeutral();
 			if (Input.GetMouseButtonDown((int)moveButton))
 				MoveNeutrals();
-			if (Input.GetKeyDown(stopMovement))
-				StopNeutrals();
 		}
 
 		private void SelectNeutral()
@@ -67,12 +72,21 @@ namespace TestingEnvironmentScripts
 		{
 			if (!RaycastMousePos(out _, out var pos))
 				return;
-			selectedNeutrals.ForEach(n => n.MoveTowards(pos));
+			// selectedNeutrals.ForEach(n => n.MoveTowards(pos, null));
+			selectedNeutrals.ForEach(n => n.SetGoal(pos));
 		}
 
-		private void StopNeutrals()
+		private IEnumerator ToggleStopNeutrals()
 		{
-			selectedNeutrals.ForEach(n => n.SetMovement(Vector2.zero));
+			var stopped = false;
+			while (true)
+			{
+				if (Input.GetKeyDown(toggleStopMovement))
+					stopped = !stopped;
+				if (stopped)
+					selectedNeutrals.ForEach(n => n.SetMovement(Vector2.zero));
+				yield return null;
+			}
 		}
 
 		private bool RaycastMousePos(out RaycastHit hit, out Vector3 pos)

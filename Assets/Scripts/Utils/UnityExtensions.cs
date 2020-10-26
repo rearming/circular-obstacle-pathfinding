@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Utils
 {
 	public static class UnityExtensions
 	{
+		public static bool IsRealNull(this Object unityObject)
+		{
+			// ReSharper disable once RedundantCast.0
+			return (object)unityObject == null;
+		}
+		
 		public static Vector2 ToVec2(this Vector3 vec)
 		{
 			return new Vector2(vec.x, vec.z);

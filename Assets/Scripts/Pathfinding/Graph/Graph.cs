@@ -84,7 +84,7 @@ namespace Pathfinding.Graph
 		
 		public float Cost(Node<T> current, Node<T> next)
 		{
-			return current.links.Find(edge => edge.node.Equals(next)).graphEdge.cost;
+			return current.links.Find(edge => edge.node.Equals(next)).graphEdge.GetCost();
 		}
 
 		private bool NodesEquals(Node<T> node1, Node<T> node2)

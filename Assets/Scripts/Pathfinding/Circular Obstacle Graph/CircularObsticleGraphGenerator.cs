@@ -9,16 +9,17 @@ namespace Pathfinding.Circular_Obstacle_Graph
 	public class CircularObsticleGraphGenerator
 	{
 		public readonly Graph<Vector2> graph = new Graph<Vector2>();
+		private Actor Actor { get; set; } = new Actor(0.01f);
 
 		public Dictionary<int, Circle> Circles { get; private set; }
 		// key - circle.GetHashCode()
 		
-		public Dictionary<int, List<Edge>> SurfingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
+		public Dictionary<int, List<Edge>> SurfingEdges { get; } = new Dictionary<int, List<Edge>>();
 		// key - GetCirclesHash(circle1, circle2) 
 		
 		public Dictionary<int, List<Vector2>> PointsOnCircle { get; private set; } = new Dictionary<int, List<Vector2>>();
 		// key - circle.GetHashCode()
-		public Dictionary<int, List<Edge>> HuggingEdges { get; private set; } = new Dictionary<int, List<Edge>>();
+		public Dictionary<int, List<Edge>> HuggingEdges { get; } = new Dictionary<int, List<Edge>>();
 		// key - circle.GetHashCode()
 
 		public Vector2 Start { get; private set; }
@@ -43,6 +44,8 @@ namespace Pathfinding.Circular_Obstacle_Graph
 
 		public void SetGoal(Vector2 goal) => Goal = goal;
 
+		public void SetActor(Actor a) => Actor = a;
+
 		private void AddPointToCircles(Vector2 point)
 		{
 			var circle = new Circle(DistanceTolerance / 3f, point);
@@ -51,11 +54,13 @@ namespace Pathfinding.Circular_Obstacle_Graph
 
 		public void SetCircles(IEnumerable<Circle> c)
 		{
-			Circles = c.ToDictionary(cr => cr.GetHashCode());
+			Circles = c
+				.Select(cr => new Circle(cr.radius + Actor.Radius, cr.center)) // Minkowski Expansion by Actor.radius
+				.ToDictionary(cr => cr.GetHashCode());
 			AddPointToCircles(Start);
 			AddPointToCircles(Goal);
 		}
-
+		
 		public void GenerateGraph()
 		{
 			SurfingEdges.Clear();

@@ -1,14 +1,17 @@
+using UnityEngine.EventSystems;
 using Utils;
 
 namespace Pathfinding.Graph
 {
 	public readonly struct GraphEdge
 	{
-		public readonly float cost;
+		private readonly float cost;
 
 		public GraphEdge(float cost) => this.cost = cost;
 		
 		public static implicit operator GraphEdge(float cost) => new GraphEdge(cost);
+
+		public float GetCost() => cost;
 
 		public static bool operator ==(GraphEdge edge1, GraphEdge edge2)
 		{
@@ -34,5 +37,6 @@ namespace Pathfinding.Graph
 		{
 			return cost.GetHashCode();
 		}
+
 	}
 }

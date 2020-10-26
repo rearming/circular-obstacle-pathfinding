@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Pathfinding;
+using Pathfinding.Algorithms;
 using Pathfinding.Graph;
 using UnityEngine;
 

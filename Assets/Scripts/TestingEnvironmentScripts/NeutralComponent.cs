@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Utils;
 
@@ -12,6 +14,8 @@ namespace TestingEnvironmentScripts
 		public Material Material { get; private set; }
 
 		private MovementComponent movementComponent;
+		
+		public Vector2? Goal { get; private set; }
 
 		private void Awake()
 		{
@@ -44,17 +48,25 @@ namespace TestingEnvironmentScripts
 			SetMovement(dir.ToVec2());
 		}
 
-		public void MoveTowards(Vector3 pos)
+		public void SetGoal(Vector3 target)
 		{
-			StartCoroutine(MoveTowardsRoutine(pos));
+			Goal = target.ToVec2();
+		}
+
+		public void UnsetGoal() => Goal = null;
+
+		public void MoveTowards(Vector3 pos, Action onPointReached)
+		{
+			StartCoroutine(MoveTowardsRoutine(pos, onPointReached));
 		}
 		
-		private IEnumerator MoveTowardsRoutine(Vector3 point)
+		private IEnumerator MoveTowardsRoutine(Vector3 point, Action onPointReached)
 		{
 			var dir = (point - transform.position).normalized;
 			SetMovement(dir);
 			yield return new WaitWhile(() => Vector2.Distance(transform.position.ToVec2(), point.ToVec2()) > 0.1f);
 			SetMovement(Vector2.zero);
+			onPointReached?.Invoke();
 		}
 	}
 }
