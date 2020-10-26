@@ -103,14 +103,15 @@ namespace Pathfinding
 
 	public class AStarHeuristic<T> where T : IEquatable<T>
 	{
-
 		public readonly Func<Node<T>, Node<T>, float> func;
 		
 		public AStarHeuristic(Func<Node<T>, Node<T>, float> heuristic)
 		{
 			func = heuristic;
 		}
-
+		
+		public static AStarHeuristic<Vector2> DijkstraHeuristic => new AStarHeuristic<Vector2>(((goal, next) => 0f));
+		
 		public static AStarHeuristic<Vector2> ManhattanDistance => new AStarHeuristic<Vector2>((goal, next) =>
 		{
 			const float D = 1f;

@@ -25,7 +25,7 @@ namespace Pathfinding
 		#region Debug Drawing Properties
 
 		[Header("Debug Draw")]
-		
+
 		[SerializeField] private float gizmosHeight = 1f;
 		
 		[SerializeField] private bool hideObstacles;
@@ -45,6 +45,10 @@ namespace Pathfinding
 		
 		[SerializeField] private bool drawSortedCirclePoints = true;
 
+		[Header("Debug Data")]
+		
+		[SerializeField] private float pathCost;
+		
 		private (Transform, Renderer)[] circlesDebug;
 
 		#endregion
@@ -56,7 +60,8 @@ namespace Pathfinding
 			
 			circularGenerator = new CircularObsticleGraphGenerator();
 			circularGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.1f));
-			pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.ManhattanDistance);
+			// pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.ManhattanDistance);
+			pathfinder = new AStar<Vector2>(circularGenerator.graph, AStarHeuristic<Vector2>.DijkstraHeuristic);
 		}
 
 		private void Update()
@@ -156,12 +161,15 @@ namespace Pathfinding
 
 		private void DrawPath()
 		{
-			if (path == null) return;
+			if (path == null)
+				return;
 			
 			Gizmos.color = gizmosPath.color;
 
+			pathCost = 0f;
 			for (int i = 1; i < path.Count; i++)
 			{
+				pathCost += circularGenerator.graph.Cost(path[i - 1], path[i]);
 				Gizmos.DrawLine(path[i - 1].Content.ToVec3(gizmosHeight), path[i].Content.ToVec3(gizmosHeight));
 			}
 		}
