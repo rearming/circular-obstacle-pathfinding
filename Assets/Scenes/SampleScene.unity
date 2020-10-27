@@ -250,6 +250,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectButton: 0
   moveButton: 1
+  multipleSelection: 306
   toggleStopMovement: 32
 --- !u!4 &141308948
 Transform:
@@ -1019,6 +1020,7 @@ GameObject:
   - component: {fileID: 811984299}
   - component: {fileID: 811984303}
   - component: {fileID: 811984304}
+  - component: {fileID: 811984305}
   m_Layer: 0
   m_Name: Neutral (3)
   m_TagString: Untagged
@@ -1141,6 +1143,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b95c7825ed344bca25697d8a0992b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &811984305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811984297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 479b119ef86c46ac9b3ec9964ae283f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gizmosHeight: -1.44
+  gizmosSurfingEdges:
+    draw: 0
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosHuggingEdges:
+    draw: 0
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosGraph:
+    draw: 1
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosPath:
+    draw: 1
+    color: {r: 0.12623549, g: 0, b: 1, a: 1}
+  drawSortedCirclePoints: 0
 --- !u!1 &1149505836
 GameObject:
   m_ObjectHideFlags: 0

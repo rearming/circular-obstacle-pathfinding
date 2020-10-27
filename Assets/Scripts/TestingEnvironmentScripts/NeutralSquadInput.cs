@@ -20,6 +20,7 @@ namespace TestingEnvironmentScripts
 
 		[SerializeField] private MouseButton selectButton;
 		[SerializeField] private MouseButton moveButton;
+		[SerializeField] private KeyCode multipleSelection = KeyCode.LeftControl;
 		[SerializeField] private KeyCode toggleStopMovement = KeyCode.Space;
 
 		private Camera cam;
@@ -57,6 +58,8 @@ namespace TestingEnvironmentScripts
 				DeselectAll();
 				return;
 			}
+			if (!Input.GetKey(multipleSelection))
+				DeselectAll();
 			if (!selectedNeutrals.AddWithAction(neutral, n => n.OnSelect()))
 				selectedNeutrals.RemoveWithAction(neutral, n => n.OnDeselect());
 		}

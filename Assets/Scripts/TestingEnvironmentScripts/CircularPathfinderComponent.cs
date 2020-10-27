@@ -6,6 +6,7 @@ using Debug_Drawers;
 using Pathfinding.Algorithms;
 using Pathfinding.Circular_Obstacle_Graph;
 using Pathfinding.Graph;
+using UnityEditor.Rendering;
 using UnityEngine;
 using Utils;
 
@@ -42,7 +43,7 @@ namespace TestingEnvironmentScripts
 		private void Start()
 		{
 			GetObstacles();
-			actor = new Actor(capsuleCollider.radius);
+			actor = new Actor(capsuleCollider.radius * 1.2f);
 			
 			graphGenerator = new CircularObsticleGraphGenerator();
 			graphGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.1f));
@@ -61,26 +62,26 @@ namespace TestingEnvironmentScripts
 
 		public void StartPathfing()
 		{
-			FindPath();
+			// InvokeRepeating(nameof(FindPath), 0f, 0.2f);
 		}
 
 		private bool FindPath()
 		{
 			GetCircles();
 			
-			graphGenerator.SetStart(neutral.StartPos);
+			graphGenerator.SetStart(neutral.transform.position.ToVec2());
 			graphGenerator.SetGoal(neutral.Goal.Value);
 			graphGenerator.SetCircles(circles);
 			graphGenerator.GenerateGraph();
 
 			try
 			{
-				pathfinder.SetStart(neutral.StartPos);
+				pathfinder.SetStart(neutral.transform.position.ToVec2());
 			}
 			catch (Exception e)
 			{
 				neutral.StartPos = neutral.transform.position.ToVec2();
-				Debug.LogWarning($"Resetting start position");
+				Debug.LogWarning($"Start position was overlapped, resetting to current.");
 				Debug.LogException(e);
 				return false;
 			}
@@ -98,7 +99,9 @@ namespace TestingEnvironmentScripts
 			}
 
 			currentNode = path.GetEnumerator();
-			currentNode.MoveNext();
+			currentNode.MoveNext(); // skip null path node
+			// currentNode.MoveNext(); // skip first path node (start position), move right away to the next
+			currentGoal = currentNode.Current.Content;
 			return true;
 		}
 
@@ -106,26 +109,36 @@ namespace TestingEnvironmentScripts
 		
 		public Vector2 GetNextPos()
 		{
+			FindPath();
 			if (!GetNextNode())
 				return DefaultPosition();
+			Debug.Log($"distance between goal and pos: [{Vector2.Distance(currentGoal, transform.position.ToVec2()).ToString()}]");
+			Debug.Log($"current goal: [{currentGoal.ToString()}]");
 			return currentGoal;
 		}
 
 		private bool GetNextNode()
 		{
-			if (currentNode.Current == null)
-				return false;
-			
-			if (Vector2.Distance(neutral.transform.position.ToVec2(), currentGoal) < 0.1f)
+			// if (currentNode.Current == null)
+			// 	return false;
+			//
+			if (Vector2.Distance(neutral.transform.position.ToVec2(), neutral.Goal.Value) < 0.1f)
 			{
-				if (!currentNode.MoveNext())
-				{
-					Debug.LogWarning($"Path ended. Unsetting Goal.");
-					neutral.UnsetGoal();
-					return false;
-				}
+				Debug.LogWarning($"Path ended. Unsetting Goal.");
+				neutral.UnsetGoal();
+				return false;
 			}
-			currentGoal = currentNode.Current.Content;
+
+			try
+			{
+				currentGoal = path[1].Content;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogError($"exc, path count: [{path.Count.ToString()}]");
+			}
+			// currentGoal = currentNode.Current.Content;
 			return true;
 		}
 
