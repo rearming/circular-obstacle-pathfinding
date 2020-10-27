@@ -40,8 +40,16 @@ namespace Pathfinding.Circular_Obstacle_Graph
 			graph.SetContentEqualsComparer((v1, v2) => v1 == v2);
 		}
 
+		/// <summary>
+		/// Must be called before SetCirlces()
+		/// </summary>
+		/// <param name="start"></param>
 		public void SetStart(Vector2 start) => Start = start;
 
+		/// <summary>
+		/// Must be called before SetCirlces()
+		/// </summary>
+		/// <param name="goal"></param>
 		public void SetGoal(Vector2 goal) => Goal = goal;
 
 		public void SetActor(Actor a) => Actor = a;

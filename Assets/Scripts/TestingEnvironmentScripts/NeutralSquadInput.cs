@@ -72,7 +72,6 @@ namespace TestingEnvironmentScripts
 		{
 			if (!RaycastMousePos(out _, out var pos))
 				return;
-			// selectedNeutrals.ForEach(n => n.MoveTowards(pos, null));
 			selectedNeutrals.ForEach(n => n.SetGoal(pos));
 		}
 

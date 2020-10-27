@@ -29,7 +29,7 @@ namespace Pathfinding.Algorithms
 			if (graph.FindNode(s, out var node))
 				start = node;
 			else
-				Debug.LogError($"[{nameof(AStar<T>)}] There is no start [{s}] node in the graph!");
+				throw new ArgumentException($"[{nameof(AStar<T>)}] There is no start [{s}] node in the graph!");
 		}
 		
 		public void SetGoal(Node<T> g)
@@ -38,7 +38,7 @@ namespace Pathfinding.Algorithms
 				goal = node;
 			else
 			{
-				Debug.LogError($"[{nameof(AStar<T>)}] There is no goal [{g}] node in the graph.");
+				throw new ArgumentException($"[{nameof(AStar<T>)}] There is no goal [{g}] node in the graph.");
 			}
 		}
 

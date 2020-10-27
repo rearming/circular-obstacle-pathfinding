@@ -1,7 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Debug_Drawers;
 using Pathfinding.Algorithms;
 using Pathfinding.Circular_Obstacle_Graph;
@@ -16,13 +16,11 @@ namespace TestingEnvironmentScripts
 		private AStar<Vector2> pathfinder;
 		private CircularObsticleGraphGenerator graphGenerator;
 
-		private (Transform, CapsuleCollider) [] circlesObstacles;
+		private (Transform, CapsuleCollider, NeutralComponent) [] circlesObstacles;
 		private Circle[] circles;
 		private List<Node<Vector2>> path;
-
-		private int currentPathNodeIdx;
-		private int prevPathNodeIdx = -1;
-		private Vector2 currentFinalGoal;
+		
+		private Vector2 currentGoal;
 		
 		private Actor actor;
 		private NeutralComponent neutral;
@@ -57,65 +55,98 @@ namespace TestingEnvironmentScripts
 
 		private void Update()
 		{
-			if (neutral.Goal == null)
-				return;
-
-			if (neutral.Goal.Value != currentFinalGoal)
-				FindPath();
-
-			Move();
-			
 			if (!debugDrawer.IsRealNull())
 				debugDrawer.path = path;
 		}
 
-		private void Move()
+		public void StartPathfing()
 		{
-			if (prevPathNodeIdx == currentPathNodeIdx)
-				return;
-			prevPathNodeIdx = currentPathNodeIdx;
-			neutral.MoveTowards(path[currentPathNodeIdx].Content.ToVec3(transform.position.y), () =>
-			{
-				currentPathNodeIdx++;
-				if (currentPathNodeIdx == path.Count)
-					neutral.UnsetGoal();
-			});
+			FindPath();
 		}
 
-		private void FindPath()
+		private bool FindPath()
 		{
-			currentFinalGoal = neutral.Goal.Value;
-			currentPathNodeIdx = 0;
-			prevPathNodeIdx = -1;
-			
-			actor.Radius = capsuleCollider.radius;
-			
 			GetCircles();
-			graphGenerator.SetStart(transform.position.ToVec2());
-			graphGenerator.SetGoal(currentFinalGoal);
+			
+			graphGenerator.SetStart(neutral.StartPos);
+			graphGenerator.SetGoal(neutral.Goal.Value);
 			graphGenerator.SetCircles(circles);
 			graphGenerator.GenerateGraph();
-			
-			pathfinder.SetStart(graphGenerator.Start);
-			pathfinder.SetGoal(graphGenerator.Goal);
-			pathfinder.FindPath();
-			path = pathfinder.GetPath();
+
+			try
+			{
+				pathfinder.SetStart(neutral.StartPos);
+			}
+			catch (Exception e)
+			{
+				neutral.StartPos = neutral.transform.position.ToVec2();
+				Debug.LogWarning($"Resetting start position");
+				Debug.LogException(e);
+				return false;
+			}
+
+			try
+			{
+				pathfinder.SetGoal(neutral.Goal);
+				pathfinder.FindPath();
+				path = pathfinder.GetPath();
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+				return false;
+			}
+
+			currentNode = path.GetEnumerator();
+			currentNode.MoveNext();
+			return true;
 		}
+
+		private IEnumerator<Node<Vector2>> currentNode;
+		
+		public Vector2 GetNextPos()
+		{
+			if (!GetNextNode())
+				return DefaultPosition();
+			return currentGoal;
+		}
+
+		private bool GetNextNode()
+		{
+			if (currentNode.Current == null)
+				return false;
+			
+			if (Vector2.Distance(neutral.transform.position.ToVec2(), currentGoal) < 0.1f)
+			{
+				if (!currentNode.MoveNext())
+				{
+					Debug.LogWarning($"Path ended. Unsetting Goal.");
+					neutral.UnsetGoal();
+					return false;
+				}
+			}
+			currentGoal = currentNode.Current.Content;
+			return true;
+		}
+
+		private Vector2 DefaultPosition() => neutral.transform.position.ToVec2();
 
 		private void GetObstacles()
 		{
 			circlesObstacles = FindObjectsOfType<NeutralComponent>()
-				.Select(cc => cc.GetComponent<CapsuleCollider>())
-				.Where(cc => cc.gameObject.activeSelf && cc.gameObject != gameObject)
-				.Select(cc => (cc.gameObject.transform, cc))
+				.Select(n => (n.GetComponent<CapsuleCollider>(), n))
+				.Where(tuple =>
+					tuple.n.gameObject.activeSelf && tuple.n.gameObject != gameObject)
+				.Select(tuple =>
+					(tuple.n.gameObject.transform, tuple.Item1, tuple.n))
 				.ToArray();
 		}
 		
 		private void GetCircles()
 		{
 			circles = circlesObstacles
-				.Select(t =>
-					new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2())).ToArray();
+				.Select(tuple =>
+					new Circle(tuple.Item2.ScaledRadius(), tuple.Item1.position.ToVec2())).ToArray();
 		}
 	}
 }

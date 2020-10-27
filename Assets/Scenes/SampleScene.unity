@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &113156308
 Transform:
   m_ObjectHideFlags: 0
@@ -250,7 +250,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectButton: 0
   moveButton: 1
-  stopMovement: 32
+  toggleStopMovement: 32
 --- !u!4 &141308948
 Transform:
   m_ObjectHideFlags: 0
@@ -573,6 +573,7 @@ GameObject:
   - component: {fileID: 548519596}
   - component: {fileID: 548519595}
   - component: {fileID: 548519599}
+  - component: {fileID: 548519600}
   m_Layer: 0
   m_Name: Neutral (4)
   m_TagString: Untagged
@@ -683,6 +684,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionColor: {r: 0.58639556, g: 0.9529412, b: 0.50980395, a: 1}
+--- !u!114 &548519600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548519593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b95c7825ed344bca25697d8a0992b8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &574970108
 GameObject:
   m_ObjectHideFlags: 0
@@ -701,7 +714,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &574970109
 Transform:
   m_ObjectHideFlags: 0
@@ -841,6 +854,8 @@ GameObject:
   - component: {fileID: 785155031}
   - component: {fileID: 785155030}
   - component: {fileID: 785155034}
+  - component: {fileID: 785155035}
+  - component: {fileID: 785155036}
   m_Layer: 0
   m_Name: Neutral (2)
   m_TagString: Untagged
@@ -951,6 +966,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionColor: {r: 0.58639556, g: 0.9529412, b: 0.50980395, a: 1}
+--- !u!114 &785155035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785155028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b95c7825ed344bca25697d8a0992b8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &785155036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785155028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 479b119ef86c46ac9b3ec9964ae283f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gizmosHeight: -3.8
+  gizmosSurfingEdges:
+    draw: 0
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosHuggingEdges:
+    draw: 0
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosGraph:
+    draw: 1
+    color: {r: 0.7347094, g: 1, b: 0, a: 1}
+  gizmosPath:
+    draw: 1
+    color: {r: 1, g: 0.028831024, b: 0, a: 1}
+  drawSortedCirclePoints: 0
 --- !u!1 &811984297
 GameObject:
   m_ObjectHideFlags: 0
@@ -965,6 +1018,7 @@ GameObject:
   - component: {fileID: 811984300}
   - component: {fileID: 811984299}
   - component: {fileID: 811984303}
+  - component: {fileID: 811984304}
   m_Layer: 0
   m_Name: Neutral (3)
   m_TagString: Untagged
@@ -1075,6 +1129,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionColor: {r: 0.58639556, g: 0.9529412, b: 0.50980395, a: 1}
+--- !u!114 &811984304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811984297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b95c7825ed344bca25697d8a0992b8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1149505836
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,6 +1556,7 @@ GameObject:
   - component: {fileID: 1815552639}
   - component: {fileID: 1815552638}
   - component: {fileID: 1815552642}
+  - component: {fileID: 1815552643}
   m_Layer: 0
   m_Name: Neutral (1)
   m_TagString: Untagged
@@ -1600,6 +1667,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionColor: {r: 0.58639556, g: 0.9529412, b: 0.50980395, a: 1}
+--- !u!114 &1815552643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815552636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b95c7825ed344bca25697d8a0992b8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2073769123
 GameObject:
   m_ObjectHideFlags: 0
@@ -1610,6 +1689,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2073769125}
   - component: {fileID: 2073769124}
+  - component: {fileID: 2073769126}
   m_Layer: 0
   m_Name: 'Obstacles '
   m_TagString: Untagged
@@ -1632,22 +1712,10 @@ MonoBehaviour:
   circlesTParent: {fileID: 2073769125}
   start: {fileID: 1379870042}
   goal: {fileID: 336507303}
-  gizmosHeight: -3.5
+  actor:
+    radius: 0.25
   hideObstacles: 0
   hideObstacleMeshRenderers: 0
-  gizmosSurfingEdges:
-    draw: 0
-    color: {r: 0, g: 0.7264151, b: 0, a: 1}
-  gizmosHuggingEdges:
-    draw: 0
-    color: {r: 0.9150943, g: 0, b: 0.34600538, a: 1}
-  gizmosGraph:
-    draw: 1
-    color: {r: 1, g: 0.44145525, b: 0, a: 1}
-  gizmosPath:
-    draw: 1
-    color: {r: 1, g: 0.018845517, b: 0, a: 1}
-  drawSortedCirclePoints: 0
 --- !u!4 &2073769125
 Transform:
   m_ObjectHideFlags: 0
@@ -1667,6 +1735,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2073769126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073769123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 479b119ef86c46ac9b3ec9964ae283f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gizmosHeight: -3.8
+  gizmosSurfingEdges:
+    draw: 0
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosHuggingEdges:
+    draw: 0
+    color: {r: 0, g: 1, b: 0, a: 1}
+  gizmosGraph:
+    draw: 1
+    color: {r: 0.8679245, g: 0.49260992, b: 0, a: 1}
+  gizmosPath:
+    draw: 1
+    color: {r: 1, g: 0.018481461, b: 0, a: 1}
+  drawSortedCirclePoints: 0
 --- !u!1 &2138677391
 GameObject:
   m_ObjectHideFlags: 0
