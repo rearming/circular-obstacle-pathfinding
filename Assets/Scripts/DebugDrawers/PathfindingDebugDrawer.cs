@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Pathfinding.Circular_Obstacle_Graph;
+using Pathfinding.CircularObstacleGraph;
 using Pathfinding.Graph;
 using UnityEngine;
 using Utils;
 
-namespace Debug_Drawers
+namespace DebugDrawers
 {
 	public class PathfindingDebugDrawer : MonoBehaviour
 	{
@@ -38,8 +38,7 @@ namespace Debug_Drawers
 		
 		private void OnDrawGizmos()
 		{
-			if (!Application.isPlaying)
-				return;
+			if (!Application.isPlaying) return;
 			
 			if (gizmosSurfingEdges.draw) DrawSurfingEdges();
 			if (gizmosHuggingEdges.draw) DrawHuggingEdges();

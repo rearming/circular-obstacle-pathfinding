@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Pathfinding.Circular_Obstacle_Graph;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Utils;

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Debug_Drawers;
+using DebugDrawers;
 using Pathfinding;
 using Pathfinding.Algorithms;
-using Pathfinding.Circular_Obstacle_Graph;
+using Pathfinding.CircularObstacleGraph;
 using Pathfinding.Graph;
 using UnityEngine;
 using Utils;

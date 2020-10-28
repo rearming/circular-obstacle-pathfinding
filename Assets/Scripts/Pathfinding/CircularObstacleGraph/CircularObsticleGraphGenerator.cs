@@ -4,7 +4,7 @@ using Pathfinding.Graph;
 using UnityEngine;
 using Utils;
 
-namespace Pathfinding.Circular_Obstacle_Graph
+namespace Pathfinding.CircularObstacleGraph
 {
 	public class CircularObsticleGraphGenerator
 	{

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Pathfinding.Circular_Obstacle_Graph
+namespace Pathfinding.CircularObstacleGraph
 {
 	public readonly struct Circle
 	{
