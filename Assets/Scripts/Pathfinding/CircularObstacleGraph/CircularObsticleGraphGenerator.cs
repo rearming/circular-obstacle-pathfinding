@@ -99,7 +99,10 @@ namespace Pathfinding.CircularObstacleGraph
 				{
 					if (Vector2.Distance(huggingEdge.a, huggingEdge.b) <= DistanceTolerance)
 						continue;
-					graph.ConnectNodes(huggingEdge.a, huggingEdge.b, Vector2.Distance(huggingEdge.a, huggingEdge.b));
+					graph.ConnectNodes(
+						huggingEdge.a, huggingEdge.b,
+						Vector2.Distance(huggingEdge.a, huggingEdge.b),
+						true); // info -> 'isHuggingEdge' == true 
 				}
 			}
 

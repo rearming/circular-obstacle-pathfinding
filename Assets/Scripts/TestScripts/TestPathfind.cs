@@ -108,7 +108,7 @@ namespace TestScripts
 			PrintPath(path);
 		}
 
-		private void PrintPath(List<Node<Vector2Int>> path)
+		private void PrintPath(List<NodeWithEdge<Vector2Int>> path)
 		{
 			mapWithPath = new char[map.GetLength(0)][];
 
@@ -123,11 +123,11 @@ namespace TestScripts
 			
 			foreach (var node in path)
 			{
-				if (mapWithPath[node.Content.y][node.Content.x] == start 
-				    || mapWithPath[node.Content.y][node.Content.x] == end)
+				if (mapWithPath[node.node.Content.y][node.node.Content.x] == start 
+				    || mapWithPath[node.node.Content.y][node.node.Content.x] == end)
 					continue;
 				
-				mapWithPath[node.Content.y][node.Content.x] = pathChar;
+				mapWithPath[node.node.Content.y][node.node.Content.x] = pathChar;
 			}
 
 			mapWithPathInspector = string.Join("\n", mapWithPath.Select(s => new string(s)));

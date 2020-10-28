@@ -7,7 +7,7 @@ namespace Pathfinding.Graph
 	{
 		void AddNode(Node<T> n);
 		void RemoveNode(Node<T> n);
-		void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1);
+		void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1, object info = null);
 		void ConnectAllNodes(Action<Node<T>> connectorFunc);
 		/// <summary>
 		/// Removes all nodes with 0 links to others.

@@ -40,7 +40,7 @@ namespace Pathfinding.Graph
 			Nodes.Remove(n); // then remove node itself
 		}
 
-		public void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1)
+		public void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1, object info = null)
 		{
 			if (!FindNode(node1, out node1) || !FindNode(node2, out node2))
 				return;

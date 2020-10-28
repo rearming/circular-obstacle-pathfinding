@@ -24,7 +24,7 @@ namespace TestScripts
 		private CircularObsticleGraphGenerator circularGenerator;
 		private AStar<Vector2> pathfinder;
 
-		private List<Node<Vector2>> path;
+		private List<NodeWithEdge<Vector2>> path;
 
 		[Header("Debug Drawing")]
 		

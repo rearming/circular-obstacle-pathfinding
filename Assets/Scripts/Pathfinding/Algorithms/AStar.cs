@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Pathfinding.Graph;
 using Plugins.Priority_Queue;
 using UnityEngine;
@@ -13,7 +15,7 @@ namespace Pathfinding.Algorithms
 		private AStarHeuristic<T> heuristic;
 		
 		private readonly SimplePriorityQueue<Node<T>> frontier = new SimplePriorityQueue<Node<T>>();
-		private readonly Dictionary<Node<T>, Node<T>> cameFrom = new Dictionary<Node<T>, Node<T>>();
+		private readonly Dictionary<Node<T>, NodeWithEdge<T>> cameFrom = new Dictionary<Node<T>, NodeWithEdge<T>>();
 		private readonly Dictionary<Node<T>, float> costSoFar = new Dictionary<Node<T>, float>();
 
 		private readonly IGraph<T> graph;
@@ -74,28 +76,29 @@ namespace Pathfinding.Algorithms
 						costSoFar[next] = newCost;
 						var priority = newCost + heuristic.func(goal, next);
 						frontier.Enqueue(next, priority);
-						cameFrom[next] = current;
+						cameFrom[next] = next.links.Find(nwe => Equals(nwe.node, current)); // добавлять сюда NodeWithEdge
 					}
 				}
 			}
 		}
 
-		public List<Node<T>> GetPath()
+		public List<NodeWithEdge<T>> GetPath()
 		{
-			var current = goal;
-			var path = new List<Node<T>>();
+			var current = new NodeWithEdge<T>(goal, -1);
+			// path to goal node never gonna be hugging edge => we can make this edge without correct info field
+			var path = new List<NodeWithEdge<T>>();
 
-			while (!Equals(current, start))
+			while (!Equals(current.node, start))
 			{
 				path.Add(current);
-				if (!cameFrom.TryGetValue(current, out var newCurrent))
+				if (!cameFrom.TryGetValue(current.node, out var next))
 				{
 					Debug.LogWarning($"[{nameof(AStar<T>)}] Path incomplete!");
 					break;
 				}
-				current = newCurrent;
+				current = next;
 			}
-			path.Add(start);
+			path.Add(current);
 			path.Reverse();
 			return path;
 		}

@@ -7,8 +7,14 @@ namespace Pathfinding.Graph
 	{
 		private readonly float cost;
 
-		public GraphEdge(float cost) => this.cost = cost;
+		private readonly object info;
 		
+		public GraphEdge(float cost, object info = null)
+		{
+			this.cost = cost;
+			this.info = info;
+		}
+
 		public static implicit operator GraphEdge(float cost) => new GraphEdge(cost);
 
 		public float GetCost() => cost;

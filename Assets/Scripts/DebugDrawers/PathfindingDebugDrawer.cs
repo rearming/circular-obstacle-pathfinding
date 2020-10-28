@@ -28,9 +28,9 @@ namespace DebugDrawers
 		[SerializeField] private bool drawSortedCirclePoints = true;
 
 		public CircularObsticleGraphGenerator graphGenerator;
-		public List<Node<Vector2>> path;
+		public List<NodeWithEdge<Vector2>> path;
 
-		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<Node<Vector2>> path)
+		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<NodeWithEdge<Vector2>> path)
 		{
 			this.graphGenerator = graphGenerator;
 			this.path = path;
@@ -103,7 +103,7 @@ namespace DebugDrawers
 			
 			for (int i = 1; i < path.Count; i++)
 			{
-				Gizmos.DrawLine(path[i - 1].Content.ToVec3(gizmosHeight), path[i].Content.ToVec3(gizmosHeight));
+				Gizmos.DrawLine(path[i - 1].node.Content.ToVec3(gizmosHeight), path[i].node.Content.ToVec3(gizmosHeight));
 			}
 		}
 	}

@@ -7,9 +7,9 @@ namespace Pathfinding.Graph
 		public readonly GraphEdge graphEdge;
 		public readonly Node<T> node;
 
-		public NodeWithEdge(Node<T> node, float cost)
+		public NodeWithEdge(Node<T> node, float cost, object info = null)
 		{
-			graphEdge = new GraphEdge(cost);
+			graphEdge = new GraphEdge(cost, info);
 			this.node = node;
 		}
 	}

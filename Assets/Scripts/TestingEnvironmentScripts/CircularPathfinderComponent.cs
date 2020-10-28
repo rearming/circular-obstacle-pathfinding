@@ -19,7 +19,7 @@ namespace TestingEnvironmentScripts
 
 		private (Transform, CapsuleCollider, NeutralComponent) [] circlesObstacles;
 		private Circle[] circles;
-		private List<Node<Vector2>> path;
+		private List<NodeWithEdge<Vector2>> path;
 		
 		private Vector2 currentGoal;
 		
@@ -110,11 +110,11 @@ namespace TestingEnvironmentScripts
 			currentNode = path.GetEnumerator();
 			currentNode.MoveNext(); // skip null path node
 			// currentNode.MoveNext(); // skip first path node (start position), move right away to the next
-			currentGoal = currentNode.Current.Content;
+			// currentGoal = currentNode.Current.Content;
 			return true;
 		}
 
-		private IEnumerator<Node<Vector2>> currentNode;
+		private IEnumerator<NodeWithEdge<Vector2>> currentNode;
 		
 		public Vector2 GetNextPos()
 		{
@@ -135,9 +135,6 @@ namespace TestingEnvironmentScripts
 
 		private bool GetNextNode()
 		{
-			// if (currentNode.Current == null)
-			// 	return false;
-			//
 			if (Vector2.Distance(neutral.transform.position.ToVec2(), neutral.Goal.Value) < 0.1f
 			    || path.Count < 2)
 			{
@@ -147,7 +144,7 @@ namespace TestingEnvironmentScripts
 
 			try
 			{
-				currentGoal = path[1].Content;
+				currentGoal = path[1].node.Content;
 			}
 			catch (Exception e)
 			{
