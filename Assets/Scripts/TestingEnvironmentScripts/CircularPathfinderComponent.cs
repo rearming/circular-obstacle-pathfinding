@@ -89,6 +89,15 @@ namespace TestingEnvironmentScripts
 			try
 			{
 				pathfinder.SetGoal(neutral.Goal);
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+				return false;
+			}
+
+			try
+			{
 				pathfinder.FindPath();
 				path = pathfinder.GetPath();
 			}
@@ -109,11 +118,18 @@ namespace TestingEnvironmentScripts
 		
 		public Vector2 GetNextPos()
 		{
-			FindPath();
-			if (!GetNextNode())
+			if (!FindPath())
+			{
+				neutral.UnsetGoal();
 				return DefaultPosition();
-			Debug.Log($"distance between goal and pos: [{Vector2.Distance(currentGoal, transform.position.ToVec2()).ToString()}]");
-			Debug.Log($"current goal: [{currentGoal.ToString()}]");
+			}
+
+			if (!GetNextNode())
+			{
+				neutral.UnsetGoal();
+				return DefaultPosition();
+			}
+			
 			return currentGoal;
 		}
 
@@ -122,21 +138,22 @@ namespace TestingEnvironmentScripts
 			// if (currentNode.Current == null)
 			// 	return false;
 			//
-			if (Vector2.Distance(neutral.transform.position.ToVec2(), neutral.Goal.Value) < 0.1f)
+			if (Vector2.Distance(neutral.transform.position.ToVec2(), neutral.Goal.Value) < 0.1f
+			    || path.Count < 2)
 			{
 				Debug.LogWarning($"Path ended. Unsetting Goal.");
-				neutral.UnsetGoal();
 				return false;
 			}
 
 			try
 			{
 				currentGoal = path[1].Content;
-
 			}
 			catch (Exception e)
 			{
 				Debug.LogError($"exc, path count: [{path.Count.ToString()}]");
+				Debug.LogError($"distance: [{Vector2.Distance(neutral.transform.position.ToVec2(), neutral.Goal.Value).ToString()}]");
+				Debug.LogError($"neutral pos: [{neutral.transform.position.ToVec2().ToString()}], goal: [{neutral.Goal.Value.ToString()}]");
 			}
 			// currentGoal = currentNode.Current.Content;
 			return true;

@@ -54,19 +54,11 @@ namespace Pathfinding.CircularObstacleGraph
 
 		public void SetActor(Actor a) => Actor = a;
 
-		private void AddPointToCircles(Vector2 point)
-		{
-			var circle = new Circle(DistanceTolerance / 3f, point);
-			Circles.Add(circle.GetHashCode(), circle);
-		}
-
 		public void SetCircles(IEnumerable<Circle> c)
 		{
 			Circles = c
 				.Select(cr => new Circle(cr.radius + Actor.Radius, cr.center)) // Minkowski Expansion by Actor.radius
 				.ToDictionary(cr => cr.GetHashCode());
-			AddPointToCircles(Start);
-			AddPointToCircles(Goal);
 		}
 		
 		public void GenerateGraph()
@@ -94,9 +86,11 @@ namespace Pathfinding.CircularObstacleGraph
 				{
 					if (Vector2.Distance(surfingEdge.a, surfingEdge.b) <= DistanceTolerance)
 						continue;
-					graph.AddNode(surfingEdge.a);
-					graph.AddNode(surfingEdge.b);
-					graph.ConnectNodes(surfingEdge.a, surfingEdge.b, Vector2.Distance(surfingEdge.a, surfingEdge.b));
+					var nodeA = new Node<Vector2>(surfingEdge.a, surfingEdge.circleAhash);
+					var nodeB = new Node<Vector2>(surfingEdge.b, surfingEdge.circleBhash);
+					graph.AddNode(nodeA);
+					graph.AddNode(nodeB);
+					graph.ConnectNodes(nodeA, nodeB, Vector2.Distance(surfingEdge.a, surfingEdge.b));
 				}
 			}
 			foreach (var huggingEdgeList in HuggingEdges.Values)
@@ -108,6 +102,47 @@ namespace Pathfinding.CircularObstacleGraph
 					graph.ConnectNodes(huggingEdge.a, huggingEdge.b, Vector2.Distance(huggingEdge.a, huggingEdge.b));
 				}
 			}
+
+			AddStartAndGoalToGraph();
+		}
+
+		private void AddStartAndGoalToGraph()
+		{
+			var startNode = new Node<Vector2>(Start);
+			var goalNode = new Node<Vector2>(Goal);
+			graph.AddNode(startNode);
+			graph.AddNode(goalNode);
+			foreach (var node in graph)
+			{
+				if (ReferenceEquals(node, startNode) || ReferenceEquals(node, goalNode))
+					continue;
+				if (ConnectPointToNode(startNode, node))
+					graph.ConnectNodes(node, startNode, Vector2.Distance(node.Content, startNode.Content));
+				if (ConnectPointToNode(goalNode, node))
+					graph.ConnectNodes(node, goalNode, Vector2.Distance(node.Content, goalNode.Content));
+			}
+			if (CanConnectNodes(new Edge(Start, Goal)))
+				graph.ConnectNodes(startNode, goalNode);
+		}
+
+		private bool ConnectPointToNode(Node<Vector2> pointNode, Node<Vector2> node)
+		{
+			var selfCircle = Circles[(int)node.Info];
+			var shiftDir = node.Content - selfCircle.center;
+			// expand all points from circle's center to avoid throwing out points by it's circle overlap  
+			var shiftedCircleNode = node.Content + shiftDir * 0.1f;
+			var edge = new Edge(pointNode.Content, shiftedCircleNode);
+			return CanConnectNodes(edge);
+		}
+
+		private bool CanConnectNodes(in Edge edge)
+		{
+			foreach (var circle in Circles.Values)
+			{
+				if (ThrowSurfingEdgeOut(edge, circle))
+					return false;
+			}
+			return true;
 		}
 
 		#region Surging Edges Generation
@@ -121,7 +156,7 @@ namespace Pathfinding.CircularObstacleGraph
 				bitangents.AddRange(GetInternalBitangents(circle1, circle2));
 			if (!circle1.Contains(circle2))
 				bitangents.AddRange(GetExternalBitangents(circle1, circle2));
-			GenerateSurfingEdges(circle1, circle2, bitangents);
+			ThrowSurfingEdgesOut(circle1, circle2, bitangents);
 			AddEdges(SurfingEdges, GetCirclesHash(circle1, circle2), bitangents);
 		}
 
@@ -163,20 +198,23 @@ namespace Pathfinding.CircularObstacleGraph
 			return new List<Edge>{ CF, DE };
 		}
 
-		private void GenerateSurfingEdges(Circle circle1, Circle circle2, List<Edge> bitangents)
+		private void ThrowSurfingEdgesOut(Circle circle1, Circle circle2, List<Edge> bitangents)
 		{
-			foreach (var circle in Circles.Values)
+			foreach (var circle in Circles.Values) // test all circles
 			{
-				if (circle == circle1 || circle == circle2)
+				if (circle == circle1 || circle == circle2) // don't test circles to which edges belong
 					continue;
-				bitangents.RemoveAll(bt =>
-				{
-					var u = Vector2.Dot(circle.center - bt.a, bt.b - bt.a) / Vector2.Dot(bt.b - bt.a, bt.b - bt.a);
-					var e = bt.a + Mathf.Clamp01(u) * (bt.b - bt.a);
-					var d = (e - circle.center).magnitude;
-					return d < circle.radius; // remove if (d < radius)
-				});
+				bitangents.RemoveAll(edge => ThrowSurfingEdgeOut(edge, circle));
+				// if circle is between edge.a and edge.b, throw the edge out
 			}
+		}
+
+		private bool ThrowSurfingEdgeOut(in Edge edge, Circle circle)
+		{
+			var u = Vector2.Dot(circle.center - edge.a, edge.b - edge.a) / Vector2.Dot(edge.b - edge.a, edge.b - edge.a);
+			var e = edge.a + Mathf.Clamp01(u) * (edge.b - edge.a);
+			var d = (e - circle.center).magnitude;
+			return d < circle.radius; // remove if (d < radius)
 		}
 
 		#endregion
@@ -312,6 +350,12 @@ namespace Pathfinding.CircularObstacleGraph
 				return a.x * b.y > a.y * b.x ? -1 : 1;
 			return Quad(a) < Quad(b) ? -1 : 1;
 		}
+
+		#endregion
+
+		#region Points Graph Connection
+
+		
 
 		#endregion
 		
