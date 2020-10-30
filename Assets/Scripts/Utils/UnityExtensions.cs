@@ -19,7 +19,21 @@ namespace Utils
 		}
 		
 		public static Vector3 ToVec3(this Vector2 vec, float height) => new Vector3(vec.x, height, vec.y);
+
+		public static Vector2 Slerp(this in Vector2 a, in Vector2 b, float t)
+		{
+			return Vector3.Slerp(a.ToVec3(0f), b.ToVec3(0f), t).ToVec2();
+		}
 		
+		public static Vector2 ArcPoint(this in Vector2 a, in Vector2 b, float? height = null)
+		{
+			if (height == null)
+				height = Vector2.Distance(a, b) / 2;
+			var c = (a + b) / 2;
+			var ab = (b - a).normalized;
+			var x = c + new Vector2(-ab.y, ab.x) * height.Value;
+			return x;
+		}
 	
 		public static Vector2 Rotate(this Vector2 v, float delta)
 		{

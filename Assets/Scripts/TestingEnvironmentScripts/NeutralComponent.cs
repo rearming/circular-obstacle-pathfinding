@@ -60,7 +60,6 @@ namespace TestingEnvironmentScripts
 		private void MoveTowards(Vector3 point)
 		{
 			var dir = (point - transform.position).normalized;
-			Debug.Log($"dir: [{dir.ToVec2().ToString()}]");
 			SetMovement(dir);
 		}
 		

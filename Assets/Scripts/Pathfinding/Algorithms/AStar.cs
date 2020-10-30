@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Pathfinding.Graph;
 using Plugins.Priority_Queue;
-using UnityEngine;
 
 namespace Pathfinding.Algorithms
 {
@@ -88,13 +85,14 @@ namespace Pathfinding.Algorithms
 			// path to goal node never gonna be hugging edge => we can make this edge without correct info field
 			var path = new List<NodeWithEdge<T>>();
 
-			while (!Equals(current.node, start))
+			for (int i = 0; ; i++)
 			{
+				if (Equals(current.node, start))
+					break;
 				path.Add(current);
 				if (!cameFrom.TryGetValue(current.node, out var next))
 				{
-					Debug.LogWarning($"[{nameof(AStar<T>)}] Path incomplete!");
-					break;
+					throw new Exception($"Incomplete path on node [{i.ToString()}].");
 				}
 				current = next;
 			}

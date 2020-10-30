@@ -29,7 +29,7 @@ namespace Pathfinding.CircularObstacleGraph
 		/// Nodes closer than that distance will be considered as one same node 
 		/// </summary>
 		private float DistanceTolerance { get; set; } = 0.05f;
-		
+
 		public CircularObsticleGraphGenerator(IEnumerable<Circle> circles, Vector2 start, Vector2 goal)
 		{
 			SetStart(start);
@@ -120,9 +120,11 @@ namespace Pathfinding.CircularObstacleGraph
 				if (ReferenceEquals(node, startNode) || ReferenceEquals(node, goalNode))
 					continue;
 				if (ConnectPointToNode(startNode, node))
-					graph.ConnectNodes(node, startNode, Vector2.Distance(node.Content, startNode.Content));
+					graph.ConnectNodes(node, startNode, Vector2.Distance(node.Content, startNode.Content), 
+						node.Info == null ? (object) null : true);
 				if (ConnectPointToNode(goalNode, node))
-					graph.ConnectNodes(node, goalNode, Vector2.Distance(node.Content, goalNode.Content));
+					graph.ConnectNodes(node, goalNode, Vector2.Distance(node.Content, goalNode.Content),
+						node.Info == null ? (object) null : true);
 			}
 			if (CanConnectNodes(new Edge(Start, Goal)))
 				graph.ConnectNodes(startNode, goalNode);

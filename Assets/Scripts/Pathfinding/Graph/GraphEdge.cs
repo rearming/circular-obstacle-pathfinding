@@ -7,7 +7,7 @@ namespace Pathfinding.Graph
 	{
 		private readonly float cost;
 
-		private readonly object info;
+		public readonly object info;
 		
 		public GraphEdge(float cost, object info = null)
 		{

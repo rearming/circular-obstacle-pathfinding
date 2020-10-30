@@ -45,8 +45,8 @@ namespace Pathfinding.Graph
 			if (!FindNode(node1, out node1) || !FindNode(node2, out node2))
 				return;
 			
-			var nodeWithEdge1 = new NodeWithEdge<T>(node1, cost);
-			var nodeWithEdge2 = new NodeWithEdge<T>(node2, cost);
+			var nodeWithEdge1 = new NodeWithEdge<T>(node1, cost, info);
+			var nodeWithEdge2 = new NodeWithEdge<T>(node2, cost, info);
 
 			if (node1.links.Find(nwe => NodesWithEdgesEquals(nwe, nodeWithEdge2)) == null)
 				node1.links.Add(nodeWithEdge2);
