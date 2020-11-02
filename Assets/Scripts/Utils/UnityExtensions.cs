@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -23,6 +24,18 @@ namespace Utils
 		public static Vector2 Slerp(this in Vector2 a, in Vector2 b, float t)
 		{
 			return Vector3.Slerp(a.ToVec3(0f), b.ToVec3(0f), t).ToVec2();
+		}
+
+		public static float InverseLerp(this in Vector3 value, in Vector3 start, in Vector3 end)
+		{
+			var ab = end - start;
+			var av = value - start;
+			return Vector3.Dot(av, ab) / Vector3.Dot(ab, ab);
+		}
+
+		public static float InverseLerp(this in Vector2 value, in Vector2 start, in Vector2 end)
+		{
+			return value.ToVec3(0).InverseLerp(start.ToVec3(0), end.ToVec3(0));
 		}
 		
 		public static Vector2 ArcPoint(this in Vector2 a, in Vector2 b, float? height = null)

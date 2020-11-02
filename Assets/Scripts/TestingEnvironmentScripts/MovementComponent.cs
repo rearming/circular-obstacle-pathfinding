@@ -8,6 +8,7 @@ namespace TestingEnvironmentScripts
         [SerializeField] private MovementSpec movementSpec;
     
         public Vector2 MovementDir { get; set; }
+        public float Speed => movementSpec.Speed;
     
         void Update()
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DebugDrawers;
 using Pathfinding.Algorithms;
 using Pathfinding.CircularObstacleGraph;
@@ -22,12 +23,28 @@ namespace TestingEnvironmentScripts
 		private Vector2 currentGoal;
 		
 		private Actor actor;
+		private float baseActorRadius;
+		
 		private NeutralComponent neutral;
 		private CapsuleCollider capsuleCollider;
+
+		private int pathNodeIdx;
+		private int PathNodeIdx
+		{
+			get => pathNodeIdx;
+			set
+			{
+				t = 0f; // reset bezier lerp time on current node change
+				pathNodeIdx = value;
+			}
+
+		}
+		private float t;
 
 		#region Debug Fields
 
 		private PathfindingDebugDrawer debugDrawer;
+		[Range(0f, 1f)] [SerializeField] private float bezierT = 0.5f;
 
 		#endregion
 
@@ -41,7 +58,8 @@ namespace TestingEnvironmentScripts
 		private void Start()
 		{
 			GetObstacles();
-			actor = new Actor(capsuleCollider.radius * 1.2f);
+			baseActorRadius = capsuleCollider.radius * 1.2f;
+			actor = new Actor(baseActorRadius);
 			
 			graphGenerator = new CircularObsticleGraphGenerator();
 			graphGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.1f));
@@ -60,21 +78,24 @@ namespace TestingEnvironmentScripts
 
 		public void StartPathfing()
 		{
-			// InvokeRepeating(nameof(FindPath), 0f, 0.2f);
+			PathNodeIdx = 1;
 		}
 
 		private bool FindPath()
 		{
 			GetCircles();
+
+			// var start = neutral.transform.position.ToVec2();
+			var start = neutral.StartPos;
 			
-			graphGenerator.SetStart(neutral.transform.position.ToVec2());
+			graphGenerator.SetStart(start);
 			graphGenerator.SetGoal(neutral.Goal.Value);
 			graphGenerator.SetCircles(circles);
 			graphGenerator.GenerateGraph();
 
 			try
 			{
-				pathfinder.SetStart(neutral.transform.position.ToVec2());
+				pathfinder.SetStart(start);
 			}
 			catch (Exception e)
 			{
@@ -104,7 +125,7 @@ namespace TestingEnvironmentScripts
 				Debug.LogException(e);
 				return false;
 			}
-
+			
 			return true;
 		}
 
@@ -112,6 +133,7 @@ namespace TestingEnvironmentScripts
 		{
 			if (!FindPath())
 			{
+				neutral.UnsetGoal();
 				return DefaultPosition();
 			}
 
@@ -131,26 +153,18 @@ namespace TestingEnvironmentScripts
 				Debug.LogWarning($"Path ended. Unsetting Goal.");
 				return false;
 			}
-
+			
 			try
 			{
-				currentGoal = path[1].node.Content;
+				if (Vector2.Distance(neutral.transform.position.ToVec2(), path[PathNodeIdx].node.Content) < 0.1f)
+					PathNodeIdx++;
+
+				currentGoal = path[PathNodeIdx].node.Content;
 				bezierPointsGizmos = null;
-				if (path[1].graphEdge.info != null && path[2].graphEdge.info == null)
-				{
-					var circle = graphGenerator.Circles[(int) path[1].node.Info];
-
-					var start = neutral.transform.position.ToVec2();
-					var end = path[1].node.Content;
-					var middle = (start + end) / 2;
-					var dir = (middle - circle.center).normalized;
-					middle += dir * (Vector2.Distance(start, end) * 2);
-
-					currentGoal = GetBezier(start, end, middle, 0.5f);
-					
-					bezierPointsGizmos = new List<Vector2> { start, end, middle };
-				}
 				
+				if (IsHuggingEdge())
+					BezierMovement();
+
 			}
 			catch (Exception e)
 			{
@@ -160,10 +174,57 @@ namespace TestingEnvironmentScripts
 			return true;
 		}
 
+		private bool IsHuggingEdge()
+		{
+			return path[PathNodeIdx].graphEdge.info != null && path[PathNodeIdx + 1].graphEdge.info == null;
+		}
+
+		private void BezierMovement()
+		{
+			const float step = 0.1f;
+			
+			var circle = graphGenerator.Circles[(int) path[PathNodeIdx].node.Info];
+
+			var start = path[PathNodeIdx - 1].node.Content;
+			var end = path[PathNodeIdx].node.Content;
+			var middle = (start + end) / 2;
+			var dir = (middle - circle.center).normalized;
+			middle += dir * (Vector2.Distance(start, end));
+					
+			currentGoal = GetBezier(start, end, middle, t + step);
+			
+			bezierPointsGizmos = new List<Vector2> { start, end, middle };
+			
+			if (Vector2.Distance(neutral.transform.position.ToVec2(), GetBezier(start, end, middle, t + step)) < 0.1f)
+				t += step;
+		}
+
 		Vector2 GetBezier(Vector2 start, Vector2 end, Vector2 middle, float t)
 		{
 			return Mathf.Pow(1 - t, 2) * start + 2 * t * (1 - t) * middle + Mathf.Pow(t, 2) * end;
 		}
+
+		private Vector2 DefaultPosition() => neutral.transform.position.ToVec2();
+
+		private void GetObstacles()
+		{
+			circlesObstacles = FindObjectsOfType<NeutralComponent>()
+				.Select(n => (n.GetComponent<CapsuleCollider>(), n))
+				.Where(tuple =>
+					tuple.n.gameObject.activeSelf && tuple.n.gameObject != gameObject)
+				.Select(tuple =>
+					(tuple.n.gameObject.transform, tuple.Item1, tuple.n))
+				.ToArray();
+		}
+
+		private void GetCircles()
+		{
+			circles = circlesObstacles
+				.Select(tuple =>
+					new Circle(tuple.Item2.ScaledRadius(), tuple.Item1.position.ToVec2())).ToArray();
+		}
+
+		#region Debug Drawing
 
 		private List<Vector2> bezierPointsGizmos;
 		
@@ -182,24 +243,6 @@ namespace TestingEnvironmentScripts
 			}
 		}
 
-		private Vector2 DefaultPosition() => neutral.transform.position.ToVec2();
-
-		private void GetObstacles()
-		{
-			circlesObstacles = FindObjectsOfType<NeutralComponent>()
-				.Select(n => (n.GetComponent<CapsuleCollider>(), n))
-				.Where(tuple =>
-					tuple.n.gameObject.activeSelf && tuple.n.gameObject != gameObject)
-				.Select(tuple =>
-					(tuple.n.gameObject.transform, tuple.Item1, tuple.n))
-				.ToArray();
-		}
-		
-		private void GetCircles()
-		{
-			circles = circlesObstacles
-				.Select(tuple =>
-					new Circle(tuple.Item2.ScaledRadius(), tuple.Item1.position.ToVec2())).ToArray();
-		}
+		#endregion
 	}
 }
