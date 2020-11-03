@@ -12,5 +12,11 @@ namespace Pathfinding.Graph
 			graphEdge = new GraphEdge(cost, info);
 			this.node = node;
 		}
+
+		public NodeWithEdge(Node<T> node, in GraphEdge edge)
+		{
+			graphEdge = edge;
+			this.node = node;
+		}
 	}
 }

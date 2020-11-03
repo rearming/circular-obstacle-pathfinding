@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Pathfinding.Graph
 {
@@ -80,6 +81,30 @@ namespace Pathfinding.Graph
 		public List<Node<T>> Neighbors(Node<T> current)
 		{
 			return current.links.Select(nwe => nwe.node).ToList();
+		}
+
+		/// <summary>
+		/// Finds closest to specified place node in the graph. 
+		/// </summary>
+		/// <param name="place">Target place.</param>
+		/// <param name="cmpFunc">Distance comparer.</param>
+		/// <param name="ignoreNodeFunc">If this function returns true, node will be ignored.</param>
+		/// <returns>Closest to specified place node in the graph.</returns>
+		/// <exception cref="IndexOutOfRangeException">Thrown if Nodes.Count is less than one.</exception>
+		public Node<T> Closest(T place, Func<T, T, float> cmpFunc, Func<Node<T>, bool> ignoreNodeFunc = null)
+		{
+			if (Nodes.Count < 1)
+				throw new IndexOutOfRangeException("Can't find closest node. Nodes.Count < 1.");
+			
+			var closest = Nodes[0];
+			for (var i = 1; i < Nodes.Count; i++)
+			{
+				if (ignoreNodeFunc != null && ignoreNodeFunc(Nodes[i]))
+					continue;
+				if (cmpFunc(place, closest.Content) > cmpFunc(place, Nodes[i].Content))
+					closest = Nodes[i];
+			}
+			return closest;
 		}
 		
 		public float Cost(Node<T> current, Node<T> next)

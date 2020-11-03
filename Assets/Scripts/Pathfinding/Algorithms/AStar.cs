@@ -73,7 +73,7 @@ namespace Pathfinding.Algorithms
 						costSoFar[next] = newCost;
 						var priority = newCost + heuristic.func(goal, next);
 						frontier.Enqueue(next, priority);
-						cameFrom[next] = next.links.Find(nwe => Equals(nwe.node, current)); // добавлять сюда NodeWithEdge
+						cameFrom[next] = next.links.Find(nwe => Equals(nwe.node, current));
 					}
 				}
 			}
@@ -82,22 +82,21 @@ namespace Pathfinding.Algorithms
 		public List<NodeWithEdge<T>> GetPath()
 		{
 			var current = new NodeWithEdge<T>(goal, -1);
-			// path to goal node never gonna be hugging edge => we can make this edge without correct info field
 			var path = new List<NodeWithEdge<T>>();
 
-			for (int i = 0; ; i++)
+			for (var i = 0; ; i++)
 			{
 				if (Equals(current.node, start))
 					break;
 				path.Add(current);
 				if (!cameFrom.TryGetValue(current.node, out var next))
-				{
-					throw new Exception($"Incomplete path on node [{i.ToString()}].");
-				}
+					throw new IncompletePathException($"Incomplete path. Goal wasn't reached.", i);
 				current = next;
 			}
 			path.Add(current);
 			path.Reverse();
+			if (path.Count < 2)
+				throw new SmallPathException($"Too small path. Path contains less than 2 nodes.");
 			return path;
 		}
 	}

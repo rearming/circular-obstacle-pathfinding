@@ -38,15 +38,6 @@ namespace Utils
 			return value.ToVec3(0).InverseLerp(start.ToVec3(0), end.ToVec3(0));
 		}
 		
-		public static Vector2 ArcPoint(this in Vector2 a, in Vector2 b, float? height = null)
-		{
-			if (height == null)
-				height = Vector2.Distance(a, b) / 2;
-			var c = (a + b) / 2;
-			var ab = (b - a).normalized;
-			var x = c + new Vector2(-ab.y, ab.x) * height.Value;
-			return x;
-		}
 	
 		public static Vector2 Rotate(this Vector2 v, float delta)
 		{
@@ -54,11 +45,6 @@ namespace Utils
 				v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
 				v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
 			);
-		}
-
-		public static float Cross(this Vector2 a, Vector2 b)
-		{
-			return a.x * b.y - b.y * a.x;
 		}
 
 		public static float ScaledRadius(this CapsuleCollider col)

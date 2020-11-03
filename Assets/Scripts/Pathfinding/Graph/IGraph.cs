@@ -14,6 +14,8 @@ namespace Pathfinding.Graph
 		/// </summary>
 		void CleanupDisconnectedNodes();
 
+		Node<T> Closest(T place, Func<T, T, float> cmpFunc, Func<Node<T>, bool> ignoreNodeFunc = null);
+
 		void SetContentEqualsComparer(Func<T, T, bool> comparer);
 		void Clear();
 

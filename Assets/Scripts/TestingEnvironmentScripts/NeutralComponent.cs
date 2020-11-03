@@ -39,10 +39,19 @@ namespace TestingEnvironmentScripts
 
 		public void SetMovement(Vector3 dir) => SetMovement(dir.ToVec2());
 
+		public void SetStart() => StartPos = transform.position.ToVec2();
+		
+		public void SetStart(Vector2 startPos) => StartPos = startPos;
+
 		public void SetGoal(Vector3 target)
 		{
+			SetGoal(target.ToVec2());
+		}
+
+		public void SetGoal(Vector2 target)
+		{
+			Goal = target;
 			StartPos = transform.position.ToVec2();
-			Goal = target.ToVec2();
 			pathfinder.StartPathfing();
 		}
 

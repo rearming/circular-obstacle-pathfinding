@@ -24,7 +24,8 @@ namespace DebugDrawers
 		[SerializeField] private GizmosDrawingProperty gizmosHuggingEdges;
 		[SerializeField] private GizmosDrawingProperty gizmosGraph;
 		[SerializeField] private GizmosDrawingProperty gizmosPath;
-		
+
+		[SerializeField] private bool drawGraphWithInfo = true;
 		[SerializeField] private bool drawSortedCirclePoints = true;
 
 		public CircularObsticleGraphGenerator graphGenerator;
@@ -45,6 +46,7 @@ namespace DebugDrawers
 			if (drawSortedCirclePoints) DrawSortedCirclePoints();
 			if (gizmosGraph.draw) DrawGraph();
 			if (gizmosPath.draw) DrawPath();
+			if (drawGraphWithInfo) DrawGraphWithInfo();
 		}
 
 		private void DrawSurfingEdges()
@@ -90,6 +92,29 @@ namespace DebugDrawers
 				foreach (var connectedNode in node.links)
 				{
 					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.node.Content.ToVec3(gizmosHeight));
+				}
+			}
+		}
+
+		private void DrawGraphWithInfo()
+		{
+			foreach (var node in graphGenerator.graph)
+			{
+				foreach (var nodeWithEdge in node.links)
+				{
+					var height = gizmosHeight;
+					if (nodeWithEdge.graphEdge.info != null)
+					{
+						Gizmos.color = gizmosHuggingEdges.color;
+						
+					}
+					else
+					{
+						Gizmos.color = gizmosSurfingEdges.color;
+						height -= 0.3f;
+					}
+					
+					Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
 				}
 			}
 		}
