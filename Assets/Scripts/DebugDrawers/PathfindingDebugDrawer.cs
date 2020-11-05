@@ -9,17 +9,9 @@ namespace DebugDrawers
 {
 	public class PathfindingDebugDrawer : MonoBehaviour
 	{
-		[Header("Debug Draw")]
+		[Header("Debug Draw")] [SerializeField]
+		private float gizmosHeight = 1f;
 
-		[SerializeField] private float gizmosHeight = 1f;
-
-		[Serializable]
-		private class GizmosDrawingProperty
-		{
-			public bool draw = true;
-			public Color color = Color.green;
-		}
-		
 		[SerializeField] private GizmosDrawingProperty gizmosSurfingEdges;
 		[SerializeField] private GizmosDrawingProperty gizmosHuggingEdges;
 		[SerializeField] private GizmosDrawingProperty gizmosGraph;
@@ -27,26 +19,26 @@ namespace DebugDrawers
 
 		[SerializeField] private bool drawGraphWithInfo = true;
 		[SerializeField] private bool drawSortedCirclePoints = true;
-
-		public CircularObsticleGraphGenerator graphGenerator;
 		public List<NodeWithEdge<Vector2>> path;
 
-		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<NodeWithEdge<Vector2>> path)
-		{
-			this.graphGenerator = graphGenerator;
-			this.path = path;
-		}
-		
+		public CircularObsticleGraphGenerator graphGenerator;
+
 		private void OnDrawGizmos()
 		{
 			if (!Application.isPlaying) return;
-			
+
 			if (gizmosSurfingEdges.draw) DrawSurfingEdges();
 			if (gizmosHuggingEdges.draw) DrawHuggingEdges();
 			if (drawSortedCirclePoints) DrawSortedCirclePoints();
 			if (gizmosGraph.draw) DrawGraph();
 			if (gizmosPath.draw) DrawPath();
 			if (drawGraphWithInfo) DrawGraphWithInfo();
+		}
+
+		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<NodeWithEdge<Vector2>> path)
+		{
+			this.graphGenerator = graphGenerator;
+			this.path = path;
 		}
 
 		private void DrawSurfingEdges()
@@ -79,7 +71,8 @@ namespace DebugDrawers
 					var t = pointList.Count > 1 ? (float) i / (pointList.Count - 1) : 0;
 					var center = graphGenerator.Circles[circleHash].center.ToVec3(gizmosHeight);
 					Gizmos.color = Color.Lerp(Color.red, Color.blue, t);
-					Gizmos.DrawLine(center, Vector3.Lerp(center, pointList[i].ToVec3(gizmosHeight), Mathf.Lerp(0.5f, 1f, t)));
+					Gizmos.DrawLine(center,
+						Vector3.Lerp(center, pointList[i].ToVec3(gizmosHeight), Mathf.Lerp(0.5f, 1f, t)));
 				}
 			});
 		}
@@ -88,32 +81,29 @@ namespace DebugDrawers
 		{
 			Gizmos.color = gizmosGraph.color;
 			foreach (var node in graphGenerator.graph)
-			{
-				foreach (var connectedNode in node.links)
-				{
-					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.node.Content.ToVec3(gizmosHeight));
-				}
-			}
+			foreach (var connectedNode in node.links)
+				Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.node.Content.ToVec3(gizmosHeight));
 		}
 
 		private void DrawGraphWithInfo()
 		{
 			foreach (var node in graphGenerator.graph)
+			foreach (var nodeWithEdge in node.links)
 			{
-				foreach (var nodeWithEdge in node.links)
+				var height = gizmosHeight;
+				if (nodeWithEdge.graphEdge.info != null && nodeWithEdge.graphEdge.info is EdgeInfo ei)
 				{
-					var height = gizmosHeight;
-					if (nodeWithEdge.graphEdge.info != null)
-					{
-						Gizmos.color = gizmosHuggingEdges.color;
-						
-					}
-					else
-					{
-						Gizmos.color = gizmosSurfingEdges.color;
-						height -= 0.3f;
-					}
-					
+					Gizmos.color = gizmosHuggingEdges.color;
+
+
+					Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
+
+					foreach (var point in ei.middlePoints) Gizmos.DrawSphere(point.ToVec3(height), 0.05f);
+				}
+				else
+				{
+					height -= 0.3f;
+					Gizmos.color = gizmosSurfingEdges.color;
 					Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
 				}
 			}
@@ -123,13 +113,19 @@ namespace DebugDrawers
 		{
 			if (path == null)
 				return;
-			
+
 			Gizmos.color = gizmosPath.color;
-			
-			for (int i = 1; i < path.Count; i++)
-			{
-				Gizmos.DrawLine(path[i - 1].node.Content.ToVec3(gizmosHeight), path[i].node.Content.ToVec3(gizmosHeight));
-			}
+
+			for (var i = 1; i < path.Count; i++)
+				Gizmos.DrawLine(path[i - 1].node.Content.ToVec3(gizmosHeight),
+					path[i].node.Content.ToVec3(gizmosHeight));
+		}
+
+		[Serializable]
+		private class GizmosDrawingProperty
+		{
+			public bool draw = true;
+			public Color color = Color.green;
 		}
 	}
 }

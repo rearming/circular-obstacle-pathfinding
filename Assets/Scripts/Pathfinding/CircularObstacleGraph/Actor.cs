@@ -6,10 +6,17 @@ namespace Pathfinding.CircularObstacleGraph
 	[Serializable]
 	public class Actor
 	{
-		public Actor(float radius) => this.radius = radius;
+		[Range(0f, 5f)] [SerializeField] private float radius;
 
-		[Range(0f, 5f)] [SerializeField]
-		private float radius;
+		public Actor(float radius)
+		{
+			this.radius = radius;
+		}
+
+		private Actor()
+		{
+		}
+
 		public float Radius
 		{
 			get => radius;
@@ -20,7 +27,5 @@ namespace Pathfinding.CircularObstacleGraph
 				radius = value;
 			}
 		}
-
-		private Actor() { }
 	}
 }

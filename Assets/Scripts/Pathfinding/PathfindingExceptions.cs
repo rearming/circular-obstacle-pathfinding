@@ -5,27 +5,40 @@ namespace Pathfinding
 	[Serializable]
 	public class SmallPathException : Exception
 	{
-		public SmallPathException () { }
+		public SmallPathException()
+		{
+		}
 
-		public SmallPathException (string message) : base(message) { }
+		public SmallPathException(string message) : base(message)
+		{
+		}
 
-		public SmallPathException (string message, Exception innerException) : base (message, innerException) { }
+		public SmallPathException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
 	}
-	
+
 	[Serializable]
 	public class IncompletePathException : Exception
 	{
 		public readonly int nodesNum;
-		
-		public IncompletePathException () { }
 
-		public IncompletePathException (string message) : base(message) { }
+		public IncompletePathException()
+		{
+		}
 
-		public IncompletePathException(string message, int nodesNum) : base($"{message} On node [{nodesNum.ToString()}].")
+		public IncompletePathException(string message) : base(message)
+		{
+		}
+
+		public IncompletePathException(string message, int nodesNum) : base(
+			$"{message} On node [{nodesNum.ToString()}].")
 		{
 			this.nodesNum = nodesNum;
 		}
 
-		public IncompletePathException (string message, Exception innerException) : base (message, innerException) { }
+		public IncompletePathException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
 	}
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -11,15 +9,18 @@ namespace Utils
 		public static bool IsRealNull(this Object unityObject)
 		{
 			// ReSharper disable once RedundantCast.0
-			return (object)unityObject == null;
+			return (object) unityObject == null;
 		}
-		
+
 		public static Vector2 ToVec2(this Vector3 vec)
 		{
 			return new Vector2(vec.x, vec.z);
 		}
-		
-		public static Vector3 ToVec3(this Vector2 vec, float height) => new Vector3(vec.x, height, vec.y);
+
+		public static Vector3 ToVec3(this Vector2 vec, float height)
+		{
+			return new Vector3(vec.x, height, vec.y);
+		}
 
 		public static Vector2 Slerp(this in Vector2 a, in Vector2 b, float t)
 		{
@@ -37,9 +38,15 @@ namespace Utils
 		{
 			return value.ToVec3(0).InverseLerp(start.ToVec3(0), end.ToVec3(0));
 		}
-		
-	
-		public static Vector2 Rotate(this Vector2 v, float delta)
+
+
+		/// <summary>
+		/// Rotates vector v counterclockwise by angle delta.
+		/// </summary>
+		/// <param name="v"></param>
+		/// <param name="delta">In radians.</param>
+		/// <returns></returns>
+		public static Vector2 Rotate(this in Vector2 v, float delta)
 		{
 			return new Vector2(
 				v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
@@ -52,9 +59,9 @@ namespace Utils
 			var scale = Mathf.Max(col.gameObject.transform.localScale.x, col.gameObject.transform.localScale.z);
 			return col.radius * scale;
 		}
-		
+
 		/// <summary>
-		/// In fact, tolerance == sqrt(provided tolerance)
+		///     In fact, tolerance == sqrt(provided tolerance)
 		/// </summary>
 		/// <param name="v1"></param>
 		/// <param name="v2"></param>

@@ -2,50 +2,48 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Pathfinding.Graph
 {
 	public class Graph<T> : IGraph<T> where T : IEquatable<T>
 	{
-		private List<Node<T>> Nodes = new List<Node<T>>();
+		private ContentEqualityComparer _comparer; // for collections that require IEqualityComparer (for ex. HashSet)
 
-		private Func<T, T, bool> contentEqualsComparerFunc;
+		private Func<T, T, bool> _contentEqualsComparerFunc;
+		private readonly List<Node<T>> _nodes = new List<Node<T>>();
+
 		private Func<T, T, bool> ContentEqualsComparerFunc
 		{
-			get => contentEqualsComparerFunc;
+			get => _contentEqualsComparerFunc;
 			set
 			{
-				comparer = new ContentEqualityComparer(contentEqualsComparerFunc);
-				contentEqualsComparerFunc = value;
+				_comparer = new ContentEqualityComparer(_contentEqualsComparerFunc);
+				_contentEqualsComparerFunc = value;
 			}
 		}
 
-		private ContentEqualityComparer comparer; // for collections that require IEqualityComparer (for ex. HashSet)
-
-		public Graph() { }
-
-		public void SetContentEqualsComparer(Func<T, T, bool> c) => ContentEqualsComparerFunc = c;
+		public void SetContentEqualsComparer(Func<T, T, bool> c)
+		{
+			ContentEqualsComparerFunc = c;
+		}
 
 		public void AddNode(Node<T> n)
 		{
-			Nodes.Add(n);
+			_nodes.Add(n);
 		}
 
 		public void RemoveNode(Node<T> n)
 		{
-			foreach (var node in Nodes) // remove all connections
-			{
+			foreach (var node in _nodes) // remove all connections
 				node.links.RemoveAt(node.links.FindIndex(nwe => nwe.node == n));
-			}
-			Nodes.Remove(n); // then remove node itself
+			_nodes.Remove(n); // then remove node itself
 		}
 
 		public void ConnectNodes(Node<T> node1, Node<T> node2, float cost = 1, object info = null)
 		{
 			if (!FindNode(node1, out node1) || !FindNode(node2, out node2))
 				return;
-			
+
 			var nodeWithEdge1 = new NodeWithEdge<T>(node1, cost, info);
 			var nodeWithEdge2 = new NodeWithEdge<T>(node2, cost, info);
 
@@ -57,34 +55,34 @@ namespace Pathfinding.Graph
 
 		public void ConnectAllNodes(Action<Node<T>> connectorFunc)
 		{
-			foreach (var node in Nodes)
+			foreach (var node in _nodes)
 				connectorFunc(node);
 		}
 
 		public void CleanupDisconnectedNodes()
 		{
-			Nodes.RemoveAll(n => n.links.Count == 0);
+			_nodes.RemoveAll(n => n.links.Count == 0);
 		}
 
 		public void Clear()
 		{
-			Nodes.Clear();
+			_nodes.Clear();
 		}
 
 		public bool FindNode(Node<T> node, out Node<T> result)
 		{
-			var idx = Nodes.FindIndex(n => NodesEquals(n, node));
-			result = idx != -1 ? Nodes[idx] : default;
+			var idx = _nodes.FindIndex(n => NodesEquals(n, node));
+			result = idx != -1 ? _nodes[idx] : default;
 			return idx != -1;
 		}
 
-		public List<Node<T>> Neighbors(Node<T> current)
+		public IEnumerable<Node<T>> Neighbors(Node<T> current)
 		{
 			return current.links.Select(nwe => nwe.node).ToList();
 		}
 
 		/// <summary>
-		/// Finds closest to specified place node in the graph. 
+		///     Finds closest to specified place node in the graph.
 		/// </summary>
 		/// <param name="place">Target place.</param>
 		/// <param name="cmpFunc">Distance comparer.</param>
@@ -93,23 +91,34 @@ namespace Pathfinding.Graph
 		/// <exception cref="IndexOutOfRangeException">Thrown if Nodes.Count is less than one.</exception>
 		public Node<T> Closest(T place, Func<T, T, float> cmpFunc, Func<Node<T>, bool> ignoreNodeFunc = null)
 		{
-			if (Nodes.Count < 1)
+			if (_nodes.Count < 1)
 				throw new IndexOutOfRangeException("Can't find closest node. Nodes.Count < 1.");
-			
-			var closest = Nodes[0];
-			for (var i = 1; i < Nodes.Count; i++)
+
+			var closest = _nodes[0];
+			for (var i = 1; i < _nodes.Count; i++)
 			{
-				if (ignoreNodeFunc != null && ignoreNodeFunc(Nodes[i]))
+				if (ignoreNodeFunc != null && ignoreNodeFunc(_nodes[i]))
 					continue;
-				if (cmpFunc(place, closest.Content) > cmpFunc(place, Nodes[i].Content))
-					closest = Nodes[i];
+				if (cmpFunc(place, closest.Content) > cmpFunc(place, _nodes[i].Content))
+					closest = _nodes[i];
 			}
+
 			return closest;
 		}
-		
+
 		public float Cost(Node<T> current, Node<T> next)
 		{
 			return current.links.Find(edge => edge.node.Equals(next)).graphEdge.GetCost();
+		}
+
+		public IEnumerator<Node<T>> GetEnumerator()
+		{
+			return _nodes.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		private bool NodesEquals(Node<T> node1, Node<T> node2)
@@ -123,29 +132,19 @@ namespace Pathfinding.Graph
 		{
 			return NodesEquals(nwe1.node.Content, nwe2.node.Content) && nwe1.graphEdge == nwe2.graphEdge;
 		}
-		
-		public IEnumerator<Node<T>> GetEnumerator()
-		{
-			return Nodes.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
 
 		public class ContentEqualityComparer : IEqualityComparer<Node<T>>
 		{
+			private readonly Func<T, T, bool> _comparer;
 
-			private Func<T, T, bool> comparer;
 			public ContentEqualityComparer(Func<T, T, bool> comparerFunc)
 			{
-				comparer = comparerFunc;
+				_comparer = comparerFunc;
 			}
-			
+
 			public bool Equals(Node<T> x, Node<T> y)
 			{
-				return comparer(x.Content, y.Content);
+				return _comparer(x.Content, y.Content);
 			}
 
 			public int GetHashCode(Node<T> obj)

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Utils;
 
 namespace TestingEnvironmentScripts
@@ -14,27 +13,27 @@ namespace TestingEnvironmentScripts
 		public enum MouseButton
 		{
 			LeftButton = 0,
-			RightButton = 1,
+			RightButton = 1
 		}
 
 		[SerializeField] private MouseButton selectButton;
 		[SerializeField] private MouseButton moveButton;
 		[SerializeField] private KeyCode multipleSelection = KeyCode.LeftControl;
 		[SerializeField] private KeyCode toggleStopMovement = KeyCode.Space;
+		private readonly HashSet<NeutralComponent> _selectedNeutrals = new HashSet<NeutralComponent>();
 
-		private Camera cam;
-		
-		private (NeutralComponent, CircularPathfinderComponent) [] allNeutrals;
-		private readonly HashSet<NeutralComponent> selectedNeutrals = new HashSet<NeutralComponent>();
+		private (NeutralComponent, CircularPathfinderComponent)[] _allNeutrals;
+
+		private Camera _cam;
 
 		private void Awake()
 		{
-			cam = Camera.main;
+			_cam = Camera.main;
 		}
 
 		private void Start()
 		{
-			allNeutrals = FindObjectsOfType<NeutralComponent>()
+			_allNeutrals = FindObjectsOfType<NeutralComponent>()
 				.Select(nc => (nc, nc.GetComponent<CircularPathfinderComponent>()))
 				.ToArray();
 			StartCoroutine(ToggleStopNeutrals());
@@ -42,9 +41,9 @@ namespace TestingEnvironmentScripts
 
 		private void Update()
 		{
-			if (Input.GetMouseButtonDown((int)selectButton))
+			if (Input.GetMouseButtonDown((int) selectButton))
 				SelectNeutral();
-			if (Input.GetMouseButtonDown((int)moveButton))
+			if (Input.GetMouseButtonDown((int) moveButton))
 				MoveNeutrals();
 		}
 
@@ -57,24 +56,25 @@ namespace TestingEnvironmentScripts
 				DeselectAll();
 				return;
 			}
+
 			if (!Input.GetKey(multipleSelection))
 				DeselectAll();
-			if (!selectedNeutrals.AddWithAction(neutral, n => n.OnSelect()))
-				selectedNeutrals.RemoveWithAction(neutral, n => n.OnDeselect());
+			if (!_selectedNeutrals.AddWithAction(neutral, n => n.OnSelect()))
+				_selectedNeutrals.RemoveWithAction(neutral, n => n.OnDeselect());
 		}
 
 		private void DeselectAll()
 		{
-			foreach (var neutral in selectedNeutrals) 
+			foreach (var neutral in _selectedNeutrals)
 				neutral.OnDeselect();
-			selectedNeutrals.Clear();
+			_selectedNeutrals.Clear();
 		}
 
 		private void MoveNeutrals()
 		{
 			if (!RaycastMousePos(out _, out var pos))
 				return;
-			selectedNeutrals.ForEach(n => n.SetGoal(pos));
+			_selectedNeutrals.ForEach(n => n.SetGoal(pos));
 		}
 
 		private IEnumerator ToggleStopNeutrals()
@@ -85,7 +85,7 @@ namespace TestingEnvironmentScripts
 				if (Input.GetKeyDown(toggleStopMovement))
 					stopped = !stopped;
 				if (stopped)
-					selectedNeutrals.ForEach(n => n.SetMovement(Vector2.zero));
+					_selectedNeutrals.ForEach(n => n.SetMovement(Vector2.zero));
 				yield return null;
 			}
 		}
@@ -93,7 +93,7 @@ namespace TestingEnvironmentScripts
 		private bool RaycastMousePos(out RaycastHit hit, out Vector3 pos)
 		{
 			pos = Vector3.zero;
-			var ray = cam.ScreenPointToRay(Input.mousePosition);
+			var ray = _cam.ScreenPointToRay(Input.mousePosition);
 			if (!Physics.Raycast(ray, out hit))
 				return false;
 			pos = hit.point;

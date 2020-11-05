@@ -8,6 +8,8 @@ namespace Pathfinding.CircularObstacleGraph
 		public readonly float radius;
 		public readonly Vector2 center;
 
+		private const float PI2 = Mathf.PI * 2;
+
 		public Circle(float radius, Vector2 center)
 		{
 			this.radius = radius;
@@ -30,19 +32,39 @@ namespace Pathfinding.CircularObstacleGraph
 			return radius > d + circle2.radius;
 		}
 
-		public static bool operator ==(Circle c1, Circle c2) =>
-			c1.center == c2.center && Math.Abs(c1.radius - c2.radius) < 0.001f;
+		public float CircumferenceLength => PI2 * radius;
 
-		public static bool operator !=(Circle c1, Circle c2) => !(c1 == c2);
+		/// <param name="arcAngle">degrees</param>
+		/// <returns></returns>
+		public float ArcLength(float arcAngle)
+		{
+			var circumferenceFraction = arcAngle / 360f;
+			return CircumferenceLength * circumferenceFraction;
+		}
+
+		public static bool operator ==(Circle c1, Circle c2)
+		{
+			return c1.center == c2.center && Math.Abs(c1.radius - c2.radius) < 0.001f;
+		}
+
+		public static bool operator !=(Circle c1, Circle c2)
+		{
+			return !(c1 == c2);
+		}
 
 		public override string ToString()
 		{
 			return $"Radius: [{radius.ToString()}], Center: [{center.ToString()}]";
 		}
 
-		public override bool Equals(object obj) => 
-			obj is Circle circle && circle.center == center && Math.Abs(circle.radius - radius) < 0.001f;
+		public override bool Equals(object obj)
+		{
+			return obj is Circle circle && circle.center == center && Math.Abs(circle.radius - radius) < 0.001f;
+		}
 
-		public override int GetHashCode() => new {Center = center, Radius = radius}.GetHashCode();
+		public override int GetHashCode()
+		{
+			return new {Center = center, Radius = radius}.GetHashCode();
+		}
 	}
 }

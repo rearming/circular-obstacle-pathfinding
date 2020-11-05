@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Utils;
 
@@ -10,11 +9,11 @@ namespace TestingEnvironmentScripts
 	{
 		[SerializeField] private Color selectionColor = Color.green;
 
-		private Color baseColor;
-		public Material Material { get; private set; }
+		private Color _baseColor;
 
-		private MovementComponent movementComponent;
-		private CircularPathfinderComponent pathfinder;
+		private MovementComponent _movementComponent;
+		private CircularPathfinderComponent _pathfinder;
+		public Material Material { get; private set; }
 
 		public Vector2 StartPos { get; set; }
 		public Vector2? Goal { get; private set; }
@@ -22,26 +21,50 @@ namespace TestingEnvironmentScripts
 		private void Awake()
 		{
 			Material = GetComponent<Renderer>().material;
-			movementComponent = GetComponent<MovementComponent>();
-			pathfinder = GetComponent<CircularPathfinderComponent>();
+			_movementComponent = GetComponent<MovementComponent>();
+			_pathfinder = GetComponent<CircularPathfinderComponent>();
 		}
 
 		private void Start()
 		{
-			baseColor = Material.color;
+			_baseColor = Material.color;
 		}
 
-		public void OnSelect() => Material.color = selectionColor;
+		private void Update()
+		{
+			if (Goal != null)
+				MoveTowards(_pathfinder.GetNextPos().ToVec3(transform.position.y));
+		}
 
-		public void OnDeselect() => Material.color = baseColor;
+		public void OnSelect()
+		{
+			Material.color = selectionColor;
+		}
 
-		public void SetMovement(Vector2 dir) => movementComponent.MovementDir = dir;
+		public void OnDeselect()
+		{
+			Material.color = _baseColor;
+		}
 
-		public void SetMovement(Vector3 dir) => SetMovement(dir.ToVec2());
+		public void SetMovement(Vector2 dir)
+		{
+			_movementComponent.MovementDir = dir;
+		}
 
-		public void SetStart() => StartPos = transform.position.ToVec2();
-		
-		public void SetStart(Vector2 startPos) => StartPos = startPos;
+		public void SetMovement(Vector3 dir)
+		{
+			SetMovement(dir.ToVec2());
+		}
+
+		public void SetStart()
+		{
+			StartPos = transform.position.ToVec2();
+		}
+
+		public void SetStart(Vector2 startPos)
+		{
+			StartPos = startPos;
+		}
 
 		public void SetGoal(Vector3 target)
 		{
@@ -52,7 +75,7 @@ namespace TestingEnvironmentScripts
 		{
 			Goal = target;
 			StartPos = transform.position.ToVec2();
-			pathfinder.StartPathfing();
+			_pathfinder.StartPathfing();
 		}
 
 		public void UnsetGoal()
@@ -60,23 +83,17 @@ namespace TestingEnvironmentScripts
 			Goal = null;
 		}
 
-		private void Update()
-		{
-			if (Goal != null)
-				MoveTowards(pathfinder.GetNextPos().ToVec3(transform.position.y));
-		}
-
 		private void MoveTowards(Vector3 point)
 		{
 			var dir = (point - transform.position).normalized;
 			SetMovement(dir);
 		}
-		
+
 		private void MoveTowards(Vector3 pos, Action onPointReached)
 		{
 			StartCoroutine(MoveTowardsRoutine(pos, onPointReached));
 		}
-		
+
 		private IEnumerator MoveTowardsRoutine(Vector3 point, Action onPointReached)
 		{
 			var dir = (point - transform.position).normalized;

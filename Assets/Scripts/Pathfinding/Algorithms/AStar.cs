@@ -7,73 +7,73 @@ namespace Pathfinding.Algorithms
 {
 	public class AStar<T> where T : IEquatable<T>
 	{
-		private Node<T> start;
-		private Node<T> goal;
-		private AStarHeuristic<T> heuristic;
-		
-		private readonly SimplePriorityQueue<Node<T>> frontier = new SimplePriorityQueue<Node<T>>();
-		private readonly Dictionary<Node<T>, NodeWithEdge<T>> cameFrom = new Dictionary<Node<T>, NodeWithEdge<T>>();
-		private readonly Dictionary<Node<T>, float> costSoFar = new Dictionary<Node<T>, float>();
+		private readonly Dictionary<Node<T>, NodeWithEdge<T>> _cameFrom = new Dictionary<Node<T>, NodeWithEdge<T>>();
+		private readonly Dictionary<Node<T>, float> _costSoFar = new Dictionary<Node<T>, float>();
 
-		private readonly IGraph<T> graph;
+		private readonly SimplePriorityQueue<Node<T>> _frontier = new SimplePriorityQueue<Node<T>>();
+
+		private readonly IGraph<T> _graph;
+		private Node<T> _goal;
+		private AStarHeuristic<T> _heuristic;
+		private Node<T> _start;
 
 		public AStar(IGraph<T> graph, AStarHeuristic<T> heuristic)
 		{
-			this.graph = graph;
-			this.heuristic = heuristic;
+			this._graph = graph;
+			this._heuristic = heuristic;
 		}
 
 		public void SetStart(Node<T> s)
 		{
-			if (graph.FindNode(s, out var node))
-				start = node;
+			if (_graph.FindNode(s, out var node))
+				_start = node;
 			else
 				throw new ArgumentException($"[{nameof(AStar<T>)}] There is no start [{s}] node in the graph!");
 		}
-		
+
 		public void SetGoal(Node<T> g)
 		{
-			if (graph.FindNode(g, out var node))
-				goal = node;
+			if (_graph.FindNode(g, out var node))
+				_goal = node;
 			else
-			{
 				throw new ArgumentException($"[{nameof(AStar<T>)}] There is no goal [{g}] node in the graph.");
-			}
 		}
 
-		public void SetHeuristic(AStarHeuristic<T> h) => heuristic = h;
+		public void SetHeuristic(AStarHeuristic<T> h)
+		{
+			_heuristic = h;
+		}
 
 		private void Cleanup()
 		{
-			frontier.Clear();
-			cameFrom.Clear();
-			costSoFar.Clear();
-			graph.CleanupDisconnectedNodes();
+			_frontier.Clear();
+			_cameFrom.Clear();
+			_costSoFar.Clear();
+			_graph.CleanupDisconnectedNodes();
 		}
-		
+
 		public void FindPath()
 		{
 			Cleanup();
-			
-			frontier.Enqueue(start, 0);
-			cameFrom[start] = null;
-			costSoFar[start] = 0;
 
-			while (frontier.Count > 0)
+			_frontier.Enqueue(_start, 0);
+			_cameFrom[_start] = null;
+			_costSoFar[_start] = 0;
+
+			while (_frontier.Count > 0)
 			{
-				var current = frontier.Dequeue();
-				if (current.Content.Equals(goal.Content))
+				var current = _frontier.Dequeue();
+				if (current.Content.Equals(_goal.Content))
 					break;
-				var neighbors = graph.Neighbors(current);
-				foreach (var next in neighbors)
+				foreach (var next in _graph.Neighbors(current))
 				{
-					var newCost = costSoFar[current] + graph.Cost(current, next);
-					if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
+					var newCost = _costSoFar[current] + _graph.Cost(current, next);
+					if (!_costSoFar.ContainsKey(next) || newCost < _costSoFar[next])
 					{
-						costSoFar[next] = newCost;
-						var priority = newCost + heuristic.func(goal, next);
-						frontier.Enqueue(next, priority);
-						cameFrom[next] = next.links.Find(nwe => Equals(nwe.node, current));
+						_costSoFar[next] = newCost;
+						var priority = newCost + _heuristic.func(_goal, next);
+						_frontier.Enqueue(next, priority);
+						_cameFrom[next] = next.links.Find(nwe => Equals(nwe.node, current));
 					}
 				}
 			}
@@ -81,22 +81,23 @@ namespace Pathfinding.Algorithms
 
 		public List<NodeWithEdge<T>> GetPath()
 		{
-			var current = new NodeWithEdge<T>(goal, -1);
+			var current = new NodeWithEdge<T>(_goal, -1);
 			var path = new List<NodeWithEdge<T>>();
 
-			for (var i = 0; ; i++)
+			for (var i = 0;; i++)
 			{
-				if (Equals(current.node, start))
+				if (Equals(current.node, _start))
 					break;
 				path.Add(current);
-				if (!cameFrom.TryGetValue(current.node, out var next))
-					throw new IncompletePathException($"Incomplete path. Goal wasn't reached.", i);
+				if (!_cameFrom.TryGetValue(current.node, out var next))
+					throw new IncompletePathException("Incomplete path. Goal wasn't reached.", i);
 				current = next;
 			}
+
 			path.Add(current);
 			path.Reverse();
 			if (path.Count < 2)
-				throw new SmallPathException($"Too small path. Path contains less than 2 nodes.");
+				throw new SmallPathException("Too small path. Path contains less than 2 nodes.");
 			return path;
 		}
 	}

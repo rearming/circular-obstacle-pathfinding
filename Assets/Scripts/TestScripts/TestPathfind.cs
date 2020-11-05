@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Pathfinding;
 using Pathfinding.Algorithms;
 using Pathfinding.Graph;
 using UnityEngine;
@@ -9,12 +8,10 @@ namespace TestScripts
 {
 	public class TestPathfind : MonoBehaviour
 	{
-		[TextArea(10, 30)]
-		[SerializeField] private string rawMap;
+		[TextArea(10, 30)] [SerializeField] private string rawMap;
 
-		[TextArea(10, 30)]
-		[SerializeField] private string mapWithPathInspector;
-		
+		[TextArea(10, 30)] [SerializeField] private string mapWithPathInspector;
+
 		[SerializeField] private char start = 'S';
 		[SerializeField] private char end = 'E';
 		[SerializeField] private char empty = '*';
@@ -22,22 +19,22 @@ namespace TestScripts
 
 		[SerializeField] private char pathChar = '$';
 
-		private char[,] map;
-		private char[][] mapWithPath;
-		
-		private Node<Vector2Int> endNode;
-		private Node<Vector2Int> startNode;
+		private Node<Vector2Int> _endNode;
 
-		private Graph<Vector2Int> graph = new Graph<Vector2Int>();
-		
+		private readonly Graph<Vector2Int> _graph = new Graph<Vector2Int>();
+
+		private char[,] _map;
+		private char[][] _mapWithPath;
+		private Node<Vector2Int> _startNode;
+
 		private void Start()
 		{
 			GetMap();
 			GetNodes();
-			
+
 			// graph.ConnectAllNodes(ConnectGridNode8);
-			graph.ConnectAllNodes(ConnectGridNode4);
-			
+			_graph.ConnectAllNodes(ConnectGridNode4);
+
 			PathfindTest();
 		}
 
@@ -46,91 +43,82 @@ namespace TestScripts
 			var splitMap = rawMap.Split('\n');
 			var maxWidth = splitMap.Max(s => s.Length);
 			var maxHeight = splitMap.Length;
-			
+
 			splitMap = splitMap.Select(s => s.PadRight(maxWidth, obstacle)).ToArray();
 			rawMap = string.Join("\n", splitMap); // correct in inspector
 
-			map = new char[maxHeight, maxWidth];
-			for (int y = 0; y < maxHeight; y++)
-			{
-				for (int x = 0; x < maxWidth; x++)
-					map[y, x] = splitMap[y][x];
-			}
+			_map = new char[maxHeight, maxWidth];
+			for (var y = 0; y < maxHeight; y++)
+			for (var x = 0; x < maxWidth; x++)
+				_map[y, x] = splitMap[y][x];
 		}
 
 		private void GetNodes()
 		{
-			for (int y = 0; y < map.GetLength(0); y++)
+			for (var y = 0; y < _map.GetLength(0); y++)
+			for (var x = 0; x < _map.GetLength(1); x++)
 			{
-				for (int x = 0; x < map.GetLength(1); x++)
-				{
-					if (map[y, x] == start)
-						startNode = new Node<Vector2Int>(new Vector2Int(x, y));
-					if (map[y, x] == end)
-						endNode = new Node<Vector2Int>(new Vector2Int(x, y));
-					if (map[y, x] != obstacle)
-						graph.AddNode(new Vector2Int(x, y));
-				}
+				if (_map[y, x] == start)
+					_startNode = new Node<Vector2Int>(new Vector2Int(x, y));
+				if (_map[y, x] == end)
+					_endNode = new Node<Vector2Int>(new Vector2Int(x, y));
+				if (_map[y, x] != obstacle)
+					_graph.AddNode(new Vector2Int(x, y));
 			}
 		}
 
 		private void ConnectGridNode8(Node<Vector2Int> node)
 		{
-			for (int y = node.Content.y - 1; y <= node.Content.y + 1; y++)
+			for (var y = node.Content.y - 1; y <= node.Content.y + 1; y++)
+			for (var x = node.Content.x - 1; x <= node.Content.x + 1; x++)
 			{
-				for (int x = node.Content.x - 1; x <= node.Content.x + 1; x++)
-				{
-					if (x == node.Content.x && y == node.Content.y)
-						continue;
-					graph.ConnectNodes(node, new Vector2Int(x, y));
-				}
+				if (x == node.Content.x && y == node.Content.y)
+					continue;
+				_graph.ConnectNodes(node, new Vector2Int(x, y));
 			}
 		}
 
 		private void ConnectGridNode4(Node<Vector2Int> node)
 		{
 			var n = node.Content;
-			graph.ConnectNodes(node, new Vector2Int(n.x - 1, n.y));
-			graph.ConnectNodes(node, new Vector2Int(n.x + 1, n.y));
-			graph.ConnectNodes(node, new Vector2Int(n.x, n.y - 1));
-			graph.ConnectNodes(node, new Vector2Int(n.x, n.y + 1));
+			_graph.ConnectNodes(node, new Vector2Int(n.x - 1, n.y));
+			_graph.ConnectNodes(node, new Vector2Int(n.x + 1, n.y));
+			_graph.ConnectNodes(node, new Vector2Int(n.x, n.y - 1));
+			_graph.ConnectNodes(node, new Vector2Int(n.x, n.y + 1));
 		}
 
 		private void PathfindTest()
 		{
-			var AStar = new AStar<Vector2Int>(graph, AStarHeuristic<Vector2Int>.ManhattanDistanceInt);
-			
-			AStar.SetGoal(endNode);
-			AStar.SetStart(startNode);
-			AStar.FindPath();
-			var path =	AStar.GetPath();
-			
+			var aStar = new AStar<Vector2Int>(_graph, AStarHeuristic<Vector2Int>.ManhattanDistanceInt);
+
+			aStar.SetGoal(_endNode);
+			aStar.SetStart(_startNode);
+			aStar.FindPath();
+			var path = aStar.GetPath();
+
 			PrintPath(path);
 		}
 
 		private void PrintPath(List<NodeWithEdge<Vector2Int>> path)
 		{
-			mapWithPath = new char[map.GetLength(0)][];
+			_mapWithPath = new char[_map.GetLength(0)][];
 
-			for (int y = 0; y < map.GetLength(0); y++)
+			for (var y = 0; y < _map.GetLength(0); y++)
 			{
-				mapWithPath[y] = new char[map.GetLength(1)];
-				for (int x = 0; x < map.GetLength(1); x++)
-				{
-					mapWithPath[y][x] = map[y, x];
-				}
+				_mapWithPath[y] = new char[_map.GetLength(1)];
+				for (var x = 0; x < _map.GetLength(1); x++) _mapWithPath[y][x] = _map[y, x];
 			}
-			
+
 			foreach (var node in path)
 			{
-				if (mapWithPath[node.node.Content.y][node.node.Content.x] == start 
-				    || mapWithPath[node.node.Content.y][node.node.Content.x] == end)
+				if (_mapWithPath[node.node.Content.y][node.node.Content.x] == start
+				    || _mapWithPath[node.node.Content.y][node.node.Content.x] == end)
 					continue;
-				
-				mapWithPath[node.node.Content.y][node.node.Content.x] = pathChar;
+
+				_mapWithPath[node.node.Content.y][node.node.Content.x] = pathChar;
 			}
 
-			mapWithPathInspector = string.Join("\n", mapWithPath.Select(s => new string(s)));
+			mapWithPathInspector = string.Join("\n", _mapWithPath.Select(s => new string(s)));
 		}
 	}
 }
