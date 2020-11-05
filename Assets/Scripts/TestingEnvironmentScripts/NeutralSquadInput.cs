@@ -20,9 +20,9 @@ namespace TestingEnvironmentScripts
 		[SerializeField] private MouseButton moveButton;
 		[SerializeField] private KeyCode multipleSelection = KeyCode.LeftControl;
 		[SerializeField] private KeyCode toggleStopMovement = KeyCode.Space;
-		private readonly HashSet<NeutralComponent> _selectedNeutrals = new HashSet<NeutralComponent>();
+		private readonly HashSet<Neutral> _selectedNeutrals = new HashSet<Neutral>();
 
-		private (NeutralComponent, CircularPathfinderComponent)[] _allNeutrals;
+		private (Neutral, CircularPathfinder)[] _allNeutrals;
 
 		private Camera _cam;
 
@@ -33,8 +33,8 @@ namespace TestingEnvironmentScripts
 
 		private void Start()
 		{
-			_allNeutrals = FindObjectsOfType<NeutralComponent>()
-				.Select(nc => (nc, nc.GetComponent<CircularPathfinderComponent>()))
+			_allNeutrals = FindObjectsOfType<Neutral>()
+				.Select(nc => (nc, nc.GetComponent<CircularPathfinder>()))
 				.ToArray();
 			StartCoroutine(ToggleStopNeutrals());
 		}
@@ -51,7 +51,7 @@ namespace TestingEnvironmentScripts
 		{
 			if (!RaycastMousePos(out var hit, out _))
 				return;
-			if (!hit.collider.gameObject.TryGetComponent<NeutralComponent>(out var neutral))
+			if (!hit.collider.gameObject.TryGetComponent<Neutral>(out var neutral))
 			{
 				DeselectAll();
 				return;
@@ -85,7 +85,7 @@ namespace TestingEnvironmentScripts
 				if (Input.GetKeyDown(toggleStopMovement))
 					stopped = !stopped;
 				if (stopped)
-					_selectedNeutrals.ForEach(n => n.SetMovement(Vector2.zero));
+					_selectedNeutrals.ForEach(n => n.Stop());
 				yield return null;
 			}
 		}

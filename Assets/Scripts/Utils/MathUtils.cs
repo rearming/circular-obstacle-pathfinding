@@ -23,22 +23,7 @@ namespace Utils
 		{
 			return (a + b) / 2;
 		}
-
-		public static List<Vector2> SplitRecursive(in Vector2 a, in Vector2 b, int depth)
-		{
-			var result = new List<Vector2>();
-			depth--;
-			if (depth <= 0)
-			{
-				result.Add(Middle(a, b));
-				return result;
-			}
-
-			result.AddRange(SplitRecursive(a, Middle(a, b), depth));
-			result.AddRange(SplitRecursive(Middle(a, b), b, depth));
-			return result;
-		}
-
+		
 		public static List<Vector2> SplitArc(in Vector2 a, in Vector2 b, int splits)
 		{
 			var points = new List<Vector2>();

@@ -31,8 +31,8 @@ namespace DebugDrawers
 			if (gizmosHuggingEdges.draw) DrawHuggingEdges();
 			if (drawSortedCirclePoints) DrawSortedCirclePoints();
 			if (gizmosGraph.draw) DrawGraph();
-			if (gizmosPath.draw) DrawPath();
 			if (drawGraphWithInfo) DrawGraphWithInfo();
+			if (gizmosPath.draw) DrawPath();
 		}
 
 		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<NodeWithEdge<Vector2>> path)

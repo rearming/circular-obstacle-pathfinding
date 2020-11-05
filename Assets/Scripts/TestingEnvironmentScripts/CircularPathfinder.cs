@@ -9,13 +9,13 @@ using Utils;
 
 namespace TestingEnvironmentScripts
 {
-	public class CircularPathfinderComponent : MonoBehaviour
+	public class CircularPathfinder : MonoBehaviour
 	{
 		private Actor _actor;
 		private float _baseActorRadius;
 		private Circle[] _circles;
 
-		private (Transform, CapsuleCollider, NeutralComponent)[] _circlesObstacles;
+		private (Transform, CapsuleCollider, Neutral)[] _circlesObstacles;
 
 		private Vector2 _currentGoal;
 
@@ -27,7 +27,7 @@ namespace TestingEnvironmentScripts
 
 		private CircularObsticleGraphGenerator _graphGenerator;
 
-		private NeutralComponent _neutral;
+		private Neutral _neutral;
 		private List<NodeWithEdge<Vector2>> _path;
 		private AStar<Vector2> _pathfinder;
 
@@ -35,7 +35,7 @@ namespace TestingEnvironmentScripts
 
 		private void Awake()
 		{
-			_neutral = GetComponent<NeutralComponent>();
+			_neutral = GetComponent<Neutral>();
 			_debugDrawer = GetComponent<PathfindingDebugDrawer>();
 		}
 
@@ -71,8 +71,7 @@ namespace TestingEnvironmentScripts
 			_graphGenerator.SetGoal(_neutral.Goal.Value);
 			_graphGenerator.SetCircles(_circles);
 			_graphGenerator.GenerateGraph();
-
-
+			
 			_pathfinder.SetStart(start);
 			_pathfinder.SetGoal(_neutral.Goal);
 			_pathfinder.FindPath();
@@ -83,16 +82,18 @@ namespace TestingEnvironmentScripts
 
 		public void StartPathfing()
 		{
+			
 		}
 
 		public Vector2 GetNextPos()
 		{
+			FindPath();
 			return DefaultPosition;
 		}
 
 		private void GetObstacles()
 		{
-			_circlesObstacles = FindObjectsOfType<NeutralComponent>()
+			_circlesObstacles = FindObjectsOfType<Neutral>()
 				.Select(n => (n.GetComponent<CapsuleCollider>(), n))
 				.Where(tuple =>
 					tuple.n.gameObject.activeSelf && tuple.n.gameObject != gameObject)
