@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Plugins.Priority_Queue
+namespace Externals.Priority_Queue
 {
     /// <summary>
     /// A copy of StablePriorityQueue which also has generic priority-type

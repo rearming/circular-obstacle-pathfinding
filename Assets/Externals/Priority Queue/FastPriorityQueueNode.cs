@@ -1,4 +1,4 @@
-﻿namespace Plugins.Priority_Queue
+﻿namespace Externals.Priority_Queue
 {
     public class FastPriorityQueueNode
     {

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Plugins.Priority_Queue
+namespace Externals.Priority_Queue
 {
     /// <summary>
     /// A copy of FastPriorityQueue which is also stable - that is, when two nodes are enqueued with the same priority, they

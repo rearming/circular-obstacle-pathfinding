@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Pathfinding.Graph;
-using Plugins.Priority_Queue;
+using Externals.Priority_Queue;
 
 namespace Pathfinding.Algorithms
 {
