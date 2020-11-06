@@ -62,15 +62,19 @@ namespace Utils
 		public static void ForEachDictListElem<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<T, TK> action)
 		{
 			foreach (var list in dictionary)
-			foreach (var item in list.Value)
-				action(list.Key, item);
+			{
+				foreach (var item in list.Value)
+					action(list.Key, item);
+			}
 		}
 
 		public static void ForEachDictListElem<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<TK> action)
 		{
 			foreach (var list in dictionary)
-			foreach (var item in list.Value)
-				action(item);
+			{
+				foreach (var item in list.Value)
+					action(item);
+			}
 		}
 
 		public static void ForEachDictList<T, TK>(this IDictionary<T, List<TK>> dictionary, Action<List<TK>> action)
@@ -89,14 +93,17 @@ namespace Utils
 		{
 			var removals = new List<(T, int)>(); // key, index
 			foreach (var list in dictionary)
+			{
 				for (var i = 0; i < list.Value.Count; i++)
 				{
 					var item = list.Value[i];
 					if (removeIf(item))
 						removals.Add((list.Key, i));
 				}
+			}
 
-			foreach (var (key, idx) in removals) dictionary[key].RemoveAt(idx);
+			foreach (var (key, idx) in removals)
+				dictionary[key].RemoveAt(idx);
 		}
 
 		#endregion
