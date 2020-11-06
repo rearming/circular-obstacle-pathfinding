@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using ScriptableObjects;
-using UnityEditor.Rendering;
 using UnityEngine;
 using Utils;
 
@@ -21,14 +20,14 @@ namespace TestingEnvironmentScripts
 
 		private const float DefaultPointReachDistance = 0.05f;
 
-		public void MoveByPoints(IEnumerable<Vector3> points, float pointReachDistance = DefaultPointReachDistance, Action onMovementEnded = null)
+		public void MoveByPoints(List<Vector2> points, float pointReachDistance = DefaultPointReachDistance, Action onMovementEnded = null)
 		{
 			if (_moveByPointsRoutine != null)
 				StopCoroutine(_moveByPointsRoutine);
 			_moveByPointsRoutine = StartCoroutine(MoveByPointsRoutine(points, pointReachDistance, onMovementEnded));
 		}
 
-		public void MoveTowards(Vector3 pos, float pointReachDistance = DefaultPointReachDistance, Action onPointReached = null)
+		public void MoveTowards(Vector2 pos, float pointReachDistance = DefaultPointReachDistance, Action onPointReached = null)
 		{
 			if (_moveTowardsRoutine != null)
 				StopCoroutine(_moveTowardsRoutine);
@@ -46,22 +45,33 @@ namespace TestingEnvironmentScripts
 			transform.position += new Vector3(MovementDir.x, 0, MovementDir.y) * (movementSpec.Speed * Time.deltaTime);
 		}
 
-		private IEnumerator MoveByPointsRoutine(IEnumerable<Vector3> points, float pointReachDistance, Action onMovementEnded)
+		private IEnumerator MoveByPointsRoutine(List<Vector2> points, float pointReachDistance, Action onMovementEnded)
 		{
-			var pointsEnumerator = points.GetEnumerator();
-			while (pointsEnumerator.MoveNext())
+			var currentPointIdx = 0;
+			while (currentPointIdx < points.Count)
 			{
 				var localTargetReached = false;
-				MoveTowards(pointsEnumerator.Current, pointReachDistance, () => localTargetReached = true);
-				yield return new WaitWhile(() => !localTargetReached);
+				var idx = currentPointIdx;
+				var currentTarget = points[idx];
+				MoveTowards(currentTarget, pointReachDistance, () => localTargetReached = true);
+				yield return new WaitWhile(() =>
+				{
+					if (currentTarget != points[idx])
+					{
+						currentTarget = points[idx];
+						MoveTowards(currentTarget, pointReachDistance, () => localTargetReached = true);
+					}
+					return !localTargetReached;
+				});
+				currentPointIdx++;
 			}
 			onMovementEnded?.Invoke();
 		}
 
-		private IEnumerator MoveTowardsRoutine(Vector3 point, float pointReachDistance, Action onPointReached)
+		private IEnumerator MoveTowardsRoutine(Vector2 point, float pointReachDistance, Action onPointReached)
 		{
-			MovementDir = (point - transform.position).normalized.ToVec2();
-			yield return new WaitWhile(() => Vector2.Distance(transform.position.ToVec2(), point.ToVec2()) > pointReachDistance);
+			MovementDir = (point - transform.position.ToVec2()).normalized;
+			yield return new WaitWhile(() => Vector2.Distance(transform.position.ToVec2(), point) > pointReachDistance);
 			MovementDir = Vector2.zero;
 			onPointReached?.Invoke();
 		}

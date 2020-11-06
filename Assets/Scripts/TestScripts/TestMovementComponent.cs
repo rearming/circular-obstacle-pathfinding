@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using EditorExtensions;
 using TestingEnvironmentScripts;
 using UnityEngine;
+using Utils;
 
 namespace TestScripts
 {
@@ -12,7 +14,7 @@ namespace TestScripts
 		
 		private Movement _movement;
 		
-		private Vector3 [] _movementPoints;
+		private List<Vector2> _movementPoints;
 
 		private void Awake()
 		{
@@ -25,17 +27,18 @@ namespace TestScripts
 		}
 
 		[ExposeMethodInEditor]
+		// ReSharper disable once UnusedMember.Local
 		private void MoveByPoints()
 		{
 			_movement.MoveByPoints(_movementPoints);
 		}
 
-		private Vector3[] GetMovementPoints()
+		private List<Vector2> GetMovementPoints()
 		{
 			return parentPointsTransform.GetComponentsInChildren<Transform>()
 				.Where(t => t.gameObject != parentPointsTransform.gameObject)
-				.Select(t => t.position)
-				.ToArray();
+				.Select(t => t.position.ToVec2())
+				.ToList();
 		}
 	}
 }

@@ -94,11 +94,9 @@ namespace DebugDrawers
 				if (nodeWithEdge.graphEdge.info != null && nodeWithEdge.graphEdge.info is EdgeInfo ei)
 				{
 					Gizmos.color = gizmosHuggingEdges.color;
-
-
 					Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
-
-					foreach (var point in ei.middlePoints) Gizmos.DrawSphere(point.ToVec3(height), 0.05f);
+					foreach (var point in ei.arcPoints)
+						Gizmos.DrawSphere(point.ToVec3(height), 0.05f);
 				}
 				else
 				{
@@ -117,8 +115,7 @@ namespace DebugDrawers
 			Gizmos.color = gizmosPath.color;
 
 			for (var i = 1; i < path.Count; i++)
-				Gizmos.DrawLine(path[i - 1].node.Content.ToVec3(gizmosHeight),
-					path[i].node.Content.ToVec3(gizmosHeight));
+				Gizmos.DrawLine(path[i - 1].node.Content.ToVec3(gizmosHeight), path[i].node.Content.ToVec3(gizmosHeight));
 		}
 
 		[Serializable]

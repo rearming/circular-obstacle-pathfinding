@@ -88,6 +88,7 @@ namespace TestingEnvironmentScripts
 					_selectedNeutrals.ForEach(n => n.Stop());
 				yield return null;
 			}
+			// ReSharper disable once IteratorNeverReturns
 		}
 
 		private bool RaycastMousePos(out RaycastHit hit, out Vector3 pos)

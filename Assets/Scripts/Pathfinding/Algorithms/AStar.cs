@@ -7,6 +7,8 @@ namespace Pathfinding.Algorithms
 {
 	public class AStar<T> where T : IEquatable<T>
 	{
+		public List<NodeWithEdge<T>> Path { get; private set; }
+		
 		private readonly Dictionary<Node<T>, NodeWithEdge<T>> _cameFrom = new Dictionary<Node<T>, NodeWithEdge<T>>();
 		private readonly Dictionary<Node<T>, float> _costSoFar = new Dictionary<Node<T>, float>();
 
@@ -77,6 +79,8 @@ namespace Pathfinding.Algorithms
 					}
 				}
 			}
+
+			Path = GetPath();
 		}
 
 		public List<NodeWithEdge<T>> GetPath()

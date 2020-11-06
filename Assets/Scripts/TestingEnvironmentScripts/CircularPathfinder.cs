@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DebugDrawers;
+using Pathfinding;
 using Pathfinding.Algorithms;
 using Pathfinding.CircularObstacleGraph;
 using Pathfinding.Graph;
@@ -17,8 +18,6 @@ namespace TestingEnvironmentScripts
 
 		private (Transform, CapsuleCollider, Neutral)[] _circlesObstacles;
 
-		private Vector2 _currentGoal;
-
 		#region Debug Fields
 
 		private PathfindingDebugDrawer _debugDrawer;
@@ -29,7 +28,9 @@ namespace TestingEnvironmentScripts
 
 		private Neutral _neutral;
 		private List<NodeWithEdge<Vector2>> _path;
+		private List<NodeWithEdge<Vector2>> _prevPath;
 		private AStar<Vector2> _pathfinder;
+		private CircularGraphExpander _expander;
 
 		private Vector2 DefaultPosition => _neutral.transform.position.ToVec2();
 
@@ -42,13 +43,15 @@ namespace TestingEnvironmentScripts
 		private void Start()
 		{
 			GetObstacles();
-			_baseActorRadius = GetComponent<CapsuleCollider>().radius * 1f;
+			_baseActorRadius = GetComponent<CapsuleCollider>().radius;
 			_actor = new Actor(_baseActorRadius);
 
 			_graphGenerator = new CircularObsticleGraphGenerator();
 			_graphGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.1f));
 			_graphGenerator.SetActor(_actor);
 			_pathfinder = new AStar<Vector2>(_graphGenerator.graph, AStarHeuristic<Vector2>.EuclideanDistance);
+			
+			_expander = new CircularGraphExpander(_graphGenerator, 0.25f);
 
 			if (!_debugDrawer.IsRealNull())
 				_debugDrawer.Setup(_graphGenerator, _path);
@@ -60,12 +63,16 @@ namespace TestingEnvironmentScripts
 				_debugDrawer.path = _path;
 		}
 
+		public void StartPathfing()
+		{
+		}
+
 		private bool FindPath()
 		{
 			GetCircles();
 
-			// var start = neutral.transform.position.ToVec2();
-			var start = _neutral.StartPos;
+			var start = _neutral.transform.position.ToVec2();
+			// var start = _neutral.StartPos;
 
 			_graphGenerator.SetStart(start);
 			_graphGenerator.SetGoal(_neutral.Goal.Value);
@@ -74,21 +81,76 @@ namespace TestingEnvironmentScripts
 			
 			_pathfinder.SetStart(start);
 			_pathfinder.SetGoal(_neutral.Goal);
-			_pathfinder.FindPath();
-			_path = _pathfinder.GetPath();
+
+			try
+			{
+				_pathfinder.FindPath();
+				_path = _pathfinder.Path;
+				_expander.ExpandPathPoints(_path);
+
+			}
+			catch (SmallPathException e)
+			{
+				Debug.LogWarning(e.Message);
+				return false;
+			}
+			catch (IncompletePathException e)
+			{
+				Debug.LogWarning(e.Message);
+				// return false;
+			}
 
 			return true;
 		}
 
-		public void StartPathfing()
-		{
-			
-		}
-
 		public Vector2 GetNextPos()
 		{
-			FindPath();
+			if (_huggingEdgeMovement)
+			{
+				return HuggingEdgeMovement();
+			}
+			
+			if (FindPath())
+			{
+				if (_path[1].graphEdge.info == null)
+					return _path[1].node.Content;
+				return HuggingEdgeMovement();
+			}
+
+			_neutral.UnsetGoal();
 			return DefaultPosition;
+		}
+
+		private int _midPointsIdx;
+		private bool _huggingEdgeMovement;
+		private List<Vector2> _huggingEdgePath;
+
+		private Vector2 HuggingEdgeMovement()
+		{
+			if (!_huggingEdgeMovement)
+				PrepareHuggingEdgeMovement();
+
+			var currentPoint = _huggingEdgePath[_midPointsIdx];
+			
+			if (Vector2.Distance(_neutral.transform.position.ToVec2(), currentPoint) < 0.1f)
+				_midPointsIdx++;
+			if (_midPointsIdx >= _huggingEdgePath.Count)
+			{
+				_huggingEdgeMovement = false;
+				_midPointsIdx--;
+			}
+			
+			return _huggingEdgePath[_midPointsIdx];
+		}
+
+		private void PrepareHuggingEdgeMovement()
+		{
+			_midPointsIdx = 0;
+			_huggingEdgePath = ((EdgeInfo) _path[1].graphEdge.info).arcPoints;
+			var np = _neutral.transform.position.ToVec2();
+			if (Vector2.Distance(np, _huggingEdgePath[0]) > Vector2.Distance(np, _huggingEdgePath.Last()))
+				_huggingEdgePath.Reverse();
+			_huggingEdgeMovement = true;
 		}
 
 		private void GetObstacles()

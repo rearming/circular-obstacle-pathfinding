@@ -11,17 +11,18 @@ namespace TestingEnvironmentScripts
 
 		private Color _baseColor;
 
-		private Movement _movement;
-		private CircularPathfinder _pathfinder;
+		public Movement movement;
 		public Material Material { get; private set; }
 
 		public Vector2 StartPos { get; set; }
 		public Vector2? Goal { get; private set; }
 
+		private CircularPathfinder _pathfinder;
+		
 		private void Awake()
 		{
 			Material = GetComponent<Renderer>().material;
-			_movement = GetComponent<Movement>();
+			movement = GetComponent<Movement>();
 			_pathfinder = GetComponent<CircularPathfinder>();
 		}
 
@@ -32,10 +33,10 @@ namespace TestingEnvironmentScripts
 
 		private void Update()
 		{
-			// if (Goal != null)
-				// MoveTowards(_pathfinder.GetNextPos().ToVec3(transform.position.y));
+			if (Goal != null)
+				movement.MoveTowards(_pathfinder.GetNextPos());
 		}
-
+		
 		public void OnSelect()
 		{
 			Material.color = selectionColor;
@@ -75,7 +76,7 @@ namespace TestingEnvironmentScripts
 
 		public void Stop()
 		{
-			_movement.Stop();
+			movement.Stop();
 		}
 	}
 }

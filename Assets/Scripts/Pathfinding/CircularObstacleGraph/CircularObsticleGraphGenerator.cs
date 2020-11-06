@@ -51,11 +51,6 @@ namespace Pathfinding.CircularObstacleGraph
 		public float DistanceTolerance { get; set; } = 0.05f;
 
 		/// <summary>
-		///     All nodes except Start and Goal will be expanded from their circle's center by that value.
-		/// </summary>
-		public float ExpansionLength { get; set; } = 0.25f;
-
-		/// <summary>
 		///     Must be called before SetCirlces()
 		/// </summary>
 		/// <param name="start"></param>
@@ -89,11 +84,13 @@ namespace Pathfinding.CircularObstacleGraph
 		{
 			SurfingEdges.Clear();
 			foreach (var circle1 in Circles.Values)
-			foreach (var circle2 in Circles.Values)
 			{
-				if (circle1 == circle2)
-					continue;
-				GetSurfingEdges(circle1, circle2);
+				foreach (var circle2 in Circles.Values)
+				{
+					if (circle1 == circle2)
+						continue;
+					GetSurfingEdges(circle1, circle2);
+				}
 			}
 
 			GetHuggingEdges();
@@ -127,22 +124,7 @@ namespace Pathfinding.CircularObstacleGraph
 			}
 
 			AddStartAndGoalToGraph();
-			ExpandPointsFromCircles();
-		}
-
-		/// <summary>
-		///     Expansion is needed to prevent inability of creating graph in case of small actor/obstacle overlap.
-		///     For example, overlap can happen during hugging edge movement.
-		/// </summary>
-		private void ExpandPointsFromCircles()
-		{
-			foreach (var node in graph)
-				if (node.Info is int circleHash && Circles.TryGetValue(circleHash, out var circle)
-				) // if not Start or Goal node (has parent circle)
-				{
-					var expansionDir = (node.Content - circle.center).normalized;
-					node.Content += expansionDir * ExpansionLength; // expand all points a little from circle
-				}
+			// ExpandPointsFromCircles();
 		}
 
 		#region Surging Edges Generation
@@ -273,10 +255,8 @@ namespace Pathfinding.CircularObstacleGraph
 
 			var center = circle.center;
 			var splits = circle.ArcLength(arcAngle * Mathf.Rad2Deg) * 3;
-			var arcPoints = MathUtils.SplitArc(point1Origin, point2Origin, (int)splits)
-				.Select(v => v + center).ToList();
-			
-			// todo use circle.ArcLength(arcAngle) to determine depth
+			var arcPoints = MathUtils.SplitArc(point1Origin, point2Origin, splits <= 1 ? 1 : (int)splits)
+				.Select(p => p + center).ToList(); // move arc points from origin to their original position
 
 			return new EdgeInfo(arcAngle, arcPoints);
 		}

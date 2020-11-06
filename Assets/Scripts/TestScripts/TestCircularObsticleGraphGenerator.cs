@@ -26,7 +26,8 @@ namespace TestScripts
 		private (Transform, CapsuleCollider)[] _circlesObstacles;
 		private CircularObsticleGraphGenerator _circularGenerator;
 
-		[Header("Debug Drawing")] private PathfindingDebugDrawer _debugDrawer;
+		[Header("Debug Drawing")]
+		private PathfindingDebugDrawer _debugDrawer;
 
 		private List<NodeWithEdge<Vector2>> _path;
 		private AStar<Vector2> _pathfinder;
