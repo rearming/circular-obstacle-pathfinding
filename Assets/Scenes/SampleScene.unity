@@ -1017,7 +1017,7 @@ MonoBehaviour:
   gizmosPath:
     draw: 1
     color: {r: 1, g: 0.028831024, b: 0, a: 1}
-  drawGraphWithInfo: 0
+  drawGraphWithInfo: 1
   drawSortedCirclePoints: 0
 --- !u!1 &811984297
 GameObject:
@@ -1183,7 +1183,7 @@ MonoBehaviour:
   gizmosPath:
     draw: 1
     color: {r: 0.12623549, g: 0, b: 1, a: 1}
-  drawGraphWithInfo: 1
+  drawGraphWithInfo: 0
   drawSortedCirclePoints: 0
 --- !u!1 &1149505836
 GameObject:

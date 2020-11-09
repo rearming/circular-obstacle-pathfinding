@@ -84,7 +84,7 @@ namespace TestScripts
 		{
 			_circles = _circlesObstacles
 				.Select(t =>
-					new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2(), t.Item1))
+					new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2()))
 				.ToArray();
 		}
 

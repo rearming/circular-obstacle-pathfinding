@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Utils;
@@ -34,7 +32,7 @@ namespace TestingEnvironmentScripts
 			
 			input.SetupCallbacks(
 				SelectNeutral,
-				MoveNeutrals,
+				MoveNeutralsToMousePos,
 				() => _multipleSelection = true,
 				ToggleStopNeutrals);
 		}
@@ -62,7 +60,7 @@ namespace TestingEnvironmentScripts
 			_selectedNeutrals.Clear();
 		}
 
-		private void MoveNeutrals()
+		private void MoveNeutralsToMousePos()
 		{
 			if (!RaycastMousePos(out _, out var pos))
 				return;

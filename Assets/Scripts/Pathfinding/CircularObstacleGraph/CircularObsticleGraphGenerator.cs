@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Pathfinding.Graph;
+using TestingEnvironmentScripts;
 using UnityEngine;
 using Utils;
 
@@ -98,15 +99,17 @@ namespace Pathfinding.CircularObstacleGraph
 		{
 			graph.Clear();
 			foreach (var surfingEdgeList in SurfingEdges.Values)
-			foreach (var surfingEdge in surfingEdgeList)
 			{
-				if (Vector2.Distance(surfingEdge.a, surfingEdge.b) <= DistanceTolerance)
-					continue;
-				var nodeA = new Node<Vector2>(surfingEdge.a, surfingEdge.circleAhash);
-				var nodeB = new Node<Vector2>(surfingEdge.b, surfingEdge.circleBhash);
-				graph.AddNode(nodeA);
-				graph.AddNode(nodeB);
-				graph.ConnectNodes(nodeA, nodeB, Vector2.Distance(surfingEdge.a, surfingEdge.b));
+				foreach (var surfingEdge in surfingEdgeList)
+				{
+					if (Vector2.Distance(surfingEdge.a, surfingEdge.b) <= DistanceTolerance)
+						continue;
+					var nodeA = new Node<Vector2>(surfingEdge.a, surfingEdge.circleAhash);
+					var nodeB = new Node<Vector2>(surfingEdge.b, surfingEdge.circleBhash);
+					graph.AddNode(nodeA);
+					graph.AddNode(nodeB);
+					graph.ConnectNodes(nodeA, nodeB, Vector2.Distance(surfingEdge.a, surfingEdge.b));
+				}
 			}
 
 			foreach (var huggingEdgeList in HuggingEdges.Values)
@@ -259,9 +262,9 @@ namespace Pathfinding.CircularObstacleGraph
 			var arcPoints = MathUtils.SplitArc(point1Origin, point2Origin, splits <= 1 ? 1 : (int)splits)
 				.Select(p => p + center).ToList(); // move arc points from origin to their original position
 			
-			if (!circle.TryGetInfo(out var info) || !(info is Transform circleTransform))
-				throw new InvalidCircleInfoException($"There must be not null {typeof(Transform)} info in circle.");
-			return new EdgeInfo(arcAngle, arcPoints, circleTransform);
+			if (circle.TryGetInfo(out var info) && info is Neutral neutral)
+				return new EdgeInfo(arcAngle, arcPoints, neutral);
+			return new EdgeInfo(arcAngle, arcPoints, null);
 		}
 
 		private void ThrowHuggingEdgesOut()
