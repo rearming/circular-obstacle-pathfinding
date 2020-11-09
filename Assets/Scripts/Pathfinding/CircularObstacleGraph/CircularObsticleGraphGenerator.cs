@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Pathfinding.Graph;
-using UnityEditor.Rendering;
 using UnityEngine;
 using Utils;
 
@@ -76,7 +73,7 @@ namespace Pathfinding.CircularObstacleGraph
 		public void SetCircles(IEnumerable<Circle> c)
 		{
 			Circles = c
-				.Select(cr => new Circle(cr.radius + Actor.Radius, cr.center)) // Minkowski Expansion by Actor.radius
+				.Select(cr => new Circle(cr.radius + Actor.Radius, cr.center, cr.info)) // Minkowski Expansion by Actor.radius
 				.ToDictionary(cr => cr.GetHashCode());
 		}
 
@@ -113,18 +110,19 @@ namespace Pathfinding.CircularObstacleGraph
 			}
 
 			foreach (var huggingEdgeList in HuggingEdges.Values)
-			foreach (var huggingEdge in huggingEdgeList)
 			{
-				if (Vector2.Distance(huggingEdge.a, huggingEdge.b) <= DistanceTolerance)
-					continue;
-				graph.ConnectNodes(
-					huggingEdge.a, huggingEdge.b,
-					Vector2.Distance(huggingEdge.a, huggingEdge.b),
-					huggingEdge.edgeInfo);
+				foreach (var huggingEdge in huggingEdgeList)
+				{
+					if (Vector2.Distance(huggingEdge.a, huggingEdge.b) <= DistanceTolerance)
+						continue;
+					graph.ConnectNodes(
+						huggingEdge.a, huggingEdge.b,
+						Vector2.Distance(huggingEdge.a, huggingEdge.b),
+						huggingEdge.edgeInfo);
+				}
 			}
 
 			AddStartAndGoalToGraph();
-			// ExpandPointsFromCircles();
 		}
 
 		#region Surging Edges Generation
@@ -214,8 +212,7 @@ namespace Pathfinding.CircularObstacleGraph
 		private void GetPointsOnCircle()
 		{
 			PointsOnCircle.Clear();
-			foreach (var surfingEdgeList in SurfingEdges.Values)
-			foreach (var surfingEdge in surfingEdgeList)
+			foreach (var surfingEdge in SurfingEdges.Values.SelectMany(surfingEdgeList => surfingEdgeList))
 			{
 				PointsOnCircle.AddToDictList(surfingEdge.circleAhash, surfingEdge.a);
 				PointsOnCircle.AddToDictList(surfingEdge.circleBhash, surfingEdge.b);
@@ -223,9 +220,11 @@ namespace Pathfinding.CircularObstacleGraph
 
 			var sortedPoints = new Dictionary<int, List<Vector2>>();
 			foreach (var pointsList in PointsOnCircle)
+			{
 				sortedPoints[pointsList.Key] = pointsList.Value
 					.OrderBy(v => v, VectorPolarComparer(pointsList.Key))
 					.ToList();
+			}
 
 			PointsOnCircle = sortedPoints;
 		}
@@ -234,6 +233,7 @@ namespace Pathfinding.CircularObstacleGraph
 		{
 			HuggingEdges.Clear();
 			foreach (var pointsList in PointsOnCircle)
+			{
 				for (var i = 0; i < pointsList.Value.Count; i++)
 				{
 					var p1 = pointsList.Value[i];
@@ -243,6 +243,7 @@ namespace Pathfinding.CircularObstacleGraph
 						new Edge(p1, p2, GetHuggingEdgeInfo(p1, p2, circle)));
 					// add point and next point as hugging edge
 				}
+			}
 		}
 
 		private EdgeInfo GetHuggingEdgeInfo(in Vector2 point1, in Vector2 point2, in Circle circle)
@@ -257,8 +258,10 @@ namespace Pathfinding.CircularObstacleGraph
 			var splits = circle.ArcLength(arcAngle * Mathf.Rad2Deg) * 3;
 			var arcPoints = MathUtils.SplitArc(point1Origin, point2Origin, splits <= 1 ? 1 : (int)splits)
 				.Select(p => p + center).ToList(); // move arc points from origin to their original position
-
-			return new EdgeInfo(arcAngle, arcPoints);
+			
+			if (!circle.TryGetInfo(out var info) || !(info is Transform circleTransform))
+				throw new InvalidCircleInfoException($"There must be not null {typeof(Transform)} info in circle.");
+			return new EdgeInfo(arcAngle, arcPoints, circleTransform);
 		}
 
 		private void ThrowHuggingEdgesOut()
@@ -367,8 +370,11 @@ namespace Pathfinding.CircularObstacleGraph
 		private bool CanConnectNodes(in Edge edge)
 		{
 			foreach (var circle in Circles.Values)
+			{
 				if (ThrowSurfingEdgeOut(edge, circle))
 					return false;
+			}
+
 			return true;
 		}
 

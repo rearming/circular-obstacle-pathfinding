@@ -82,7 +82,9 @@ namespace TestScripts
 
 		private void GetCircles()
 		{
-			_circles = _circlesObstacles.Select(t => new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2()))
+			_circles = _circlesObstacles
+				.Select(t =>
+					new Circle(t.Item2.ScaledRadius(), t.Item1.position.ToVec2(), t.Item1))
 				.ToArray();
 		}
 

@@ -41,4 +41,20 @@ namespace Pathfinding
 		{
 		}
 	}
+	
+	[Serializable]
+	public class InvalidCircleInfoException : Exception
+	{
+		public InvalidCircleInfoException()
+		{
+		}
+
+		public InvalidCircleInfoException(string message) : base(message)
+		{
+		}
+
+		public InvalidCircleInfoException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
+	}
 }

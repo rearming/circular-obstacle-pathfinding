@@ -229,6 +229,7 @@ GameObject:
   m_Component:
   - component: {fileID: 141308948}
   - component: {fileID: 141308947}
+  - component: {fileID: 141308949}
   m_Layer: 0
   m_Name: Neutrals Squad
   m_TagString: Untagged
@@ -248,10 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72d1200b31d24858b6432cbd78732e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: 0
-  moveButton: 1
-  multipleSelection: 306
-  toggleStopMovement: 32
+  input: {fileID: 141308949}
 --- !u!4 &141308948
 Transform:
   m_ObjectHideFlags: 0
@@ -270,6 +268,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &141308949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141308946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd4d399127314c808e2147a64efc5341, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keymap: {fileID: 11400000, guid: fa15db30eb34bbd4da0ab52b2ad04f49, type: 2}
 --- !u!1 &204453357
 GameObject:
   m_ObjectHideFlags: 0
@@ -1006,7 +1017,7 @@ MonoBehaviour:
   gizmosPath:
     draw: 1
     color: {r: 1, g: 0.028831024, b: 0, a: 1}
-  drawGraphWithInfo: 1
+  drawGraphWithInfo: 0
   drawSortedCirclePoints: 0
 --- !u!1 &811984297
 GameObject:

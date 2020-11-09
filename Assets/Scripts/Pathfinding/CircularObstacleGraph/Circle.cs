@@ -7,13 +7,15 @@ namespace Pathfinding.CircularObstacleGraph
 	{
 		public readonly float radius;
 		public readonly Vector2 center;
+		public readonly object info;
 
 		private const float PI2 = Mathf.PI * 2;
 
-		public Circle(float radius, Vector2 center)
+		public Circle(float radius, Vector2 center, object info = null)
 		{
 			this.radius = radius;
 			this.center = center;
+			this.info = info;
 		}
 
 		public bool Overlaps(Circle circle2)
@@ -40,6 +42,12 @@ namespace Pathfinding.CircularObstacleGraph
 		{
 			var circumferenceFraction = arcAngle / 360f;
 			return CircumferenceLength * circumferenceFraction;
+		}
+
+		public bool TryGetInfo(out object oInfo)
+		{
+			oInfo = info;
+			return oInfo != null;
 		}
 
 		public static bool operator ==(Circle c1, Circle c2)

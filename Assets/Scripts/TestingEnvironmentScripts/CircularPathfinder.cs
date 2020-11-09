@@ -121,37 +121,55 @@ namespace TestingEnvironmentScripts
 			return DefaultPosition;
 		}
 
-		private int _midPointsIdx;
+		private int _huggingPointIdx;
 		private bool _huggingEdgeMovement;
 		private List<Vector2> _huggingEdgePath;
+		private Vector2 _huggingEdgeOwnerBasePos;
+		private Transform _huggingEdgeOwner;
 
 		private Vector2 HuggingEdgeMovement()
 		{
 			if (!_huggingEdgeMovement)
 				PrepareHuggingEdgeMovement();
 
-			var currentPoint = _huggingEdgePath[_midPointsIdx];
-			
+			return GetHuggingEdgePoint();
+		}
+
+		private Vector2 GetHuggingEdgePoint()
+		{
+			var currentPoint = CorrectHuggingEdgePoint(_huggingEdgePath[_huggingPointIdx]);
+
 			if (Vector2.Distance(_neutral.transform.position.ToVec2(), currentPoint) < 0.1f)
-				_midPointsIdx++;
-			if (_midPointsIdx >= _huggingEdgePath.Count)
+				_huggingPointIdx++;
+			if (_huggingPointIdx >= _huggingEdgePath.Count)
 			{
 				_huggingEdgeMovement = false;
-				_midPointsIdx--;
+				_huggingPointIdx--;
 			}
-			
-			return _huggingEdgePath[_midPointsIdx];
+
+			return CorrectHuggingEdgePoint(_huggingEdgePath[_huggingPointIdx]);
+		}
+
+		private Vector2 CorrectHuggingEdgePoint(Vector2 point)
+		{
+			return point - (_huggingEdgeOwnerBasePos - _huggingEdgeOwner.position.ToVec2());
 		}
 
 		private void PrepareHuggingEdgeMovement()
 		{
-			_midPointsIdx = 0;
-			_huggingEdgePath = ((EdgeInfo) _path[1].graphEdge.info).arcPoints;
+			_huggingPointIdx = 0;
+			var edgeInfo = (EdgeInfo) _path[1].graphEdge.info;
+			_huggingEdgePath = edgeInfo.arcPoints;
+			_huggingEdgeOwner = edgeInfo.circleOwner;
+			_huggingEdgeOwnerBasePos = _huggingEdgeOwner.position.ToVec2();
+			
 			var np = _neutral.transform.position.ToVec2();
 			if (Vector2.Distance(np, _huggingEdgePath[0]) > Vector2.Distance(np, _huggingEdgePath.Last()))
 				_huggingEdgePath.Reverse();
 			_huggingEdgeMovement = true;
 		}
+
+		#region Obstacles Getting
 
 		private void GetObstacles()
 		{
@@ -167,9 +185,12 @@ namespace TestingEnvironmentScripts
 		private void GetCircles()
 		{
 			_circles = _circlesObstacles
-				.Select(tuple =>
-					new Circle(tuple.Item2.ScaledRadius(), tuple.Item1.position.ToVec2())).ToArray();
+				.Select(tuple => 
+					new Circle(tuple.Item2.ScaledRadius(), tuple.Item1.position.ToVec2(), tuple.Item1))
+				.ToArray();
 		}
+
+		#endregion
 
 		#region Debug Drawing
 
@@ -178,8 +199,13 @@ namespace TestingEnvironmentScripts
 		private void OnDrawGizmos()
 		{
 			if (!Application.isPlaying) return;
-			if (_bezierPointsGizmos == null) return;
+			
+			if (_bezierPointsGizmos != null) DrawGizmosBezier();
+			if (_huggingEdgeMovement) DrawCorrectHuggingEdge();
+		}
 
+		private void DrawGizmosBezier()
+		{
 			Gizmos.color = Color.cyan;
 			const int segments = 10;
 			for (var t = 0; t < segments; t++)
@@ -192,6 +218,16 @@ namespace TestingEnvironmentScripts
 			}
 
 			_bezierPointsGizmos = null;
+		}
+
+		private void DrawCorrectHuggingEdge()
+		{
+			Gizmos.color = Color.red;
+			var correctPoints = _huggingEdgePath.Select(CorrectHuggingEdgePoint);
+			foreach (var correctPoint in correctPoints)
+			{
+				Gizmos.DrawSphere(correctPoint.ToVec3(-3), 0.04f);
+			}
 		}
 
 		#endregion
