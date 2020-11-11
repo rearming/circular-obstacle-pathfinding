@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
 using Utils;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	[RequireComponent(typeof(CapsuleCollider))]
 	public class CircularObstacle : MonoBehaviour

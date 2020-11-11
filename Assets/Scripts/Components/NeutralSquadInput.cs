@@ -2,7 +2,7 @@ using System;
 using ScriptableObjects;
 using UnityEngine;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	public class NeutralSquadInput : MonoBehaviour
 	{

@@ -8,7 +8,7 @@ using Pathfinding.Graph;
 using UnityEngine;
 using Utils;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	public class CircularPathfinder : MonoBehaviour
 	{

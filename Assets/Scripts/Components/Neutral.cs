@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Utils;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	public class Neutral : MonoBehaviour
 	{

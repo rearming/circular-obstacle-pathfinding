@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using Pathfinding.CircularObstacleGraph;
 using Pathfinding.Graph;
 using UnityEngine;
 
-namespace Pathfinding.Algorithms
+namespace Pathfinding.CircularObstacleGraph
 {
 	public class CircularGraphExpander
 	{

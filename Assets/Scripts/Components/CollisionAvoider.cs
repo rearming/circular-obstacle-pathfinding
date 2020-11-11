@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	public class CollisionAvoider : MonoBehaviour
 	{

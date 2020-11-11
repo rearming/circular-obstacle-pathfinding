@@ -5,7 +5,7 @@ using ScriptableObjects;
 using UnityEngine;
 using Utils;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	public class Movement : MonoBehaviour
 	{

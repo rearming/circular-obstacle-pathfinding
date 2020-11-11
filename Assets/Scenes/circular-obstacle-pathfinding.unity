@@ -351,7 +351,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 204453357}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.38267136, y: -3.88, z: -4.1944046}
+  m_LocalPosition: {x: -9.09, y: -3.88, z: -3.78}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -463,7 +463,7 @@ GameObject:
   - component: {fileID: 406249937}
   - component: {fileID: 406249936}
   m_Layer: 0
-  m_Name: Test Pathfind
+  m_Name: Test AStar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -706,7 +706,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 673792979}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.7, y: -0.6999998, z: 4.04}
+  m_LocalPosition: {x: -4.44, y: -0.6999998, z: -7.4}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 1205890069}
@@ -802,7 +802,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 719312429}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.67, y: -3.81, z: -2.74}
+  m_LocalPosition: {x: 9.16, y: -3.81, z: -1.93}
   m_LocalScale: {x: 1.9537, y: 1.4557018, z: 1.9537}
   m_Children: []
   m_Father: {fileID: 2073769125}
@@ -1095,7 +1095,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1205890064}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.27, z: 0}
+  m_LocalPosition: {x: -10.15, y: -4.27, z: 0.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1987833206}
@@ -1241,7 +1241,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1379870041}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.94, y: -4.64, z: -5.08}
+  m_LocalPosition: {x: 13.58, y: -4.64, z: -0.5}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 2073769125}
@@ -1399,7 +1399,7 @@ Transform:
   m_GameObject: {fileID: 1478243583}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.96818733, y: -5.4629555, z: -7.6656446}
-  m_LocalScale: {x: 30, y: 1, z: 30}
+  m_LocalScale: {x: 40, y: 1, z: 40}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -2240,7 +2240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd4d399127314c808e2147a64efc5341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keymap: {fileID: 11400000, guid: fa15db30eb34bbd4da0ab52b2ad04f49, type: 2}
+  keymap: {fileID: 0}
 --- !u!1 &2362961720581952134
 GameObject:
   m_ObjectHideFlags: 0
