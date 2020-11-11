@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Components;
 using UnityEngine;
 using Utils;
 
-namespace TestingEnvironmentScripts
+namespace Components
 {
 	public class NeutralSquad : MonoBehaviour
 	{
