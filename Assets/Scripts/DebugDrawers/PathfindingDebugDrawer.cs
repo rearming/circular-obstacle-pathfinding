@@ -9,8 +9,8 @@ namespace DebugDrawers
 {
 	public class PathfindingDebugDrawer : MonoBehaviour
 	{
-		[Header("Debug Draw")] [SerializeField]
-		private float gizmosHeight = 1f;
+		[Header("Debug Draw")]
+		[SerializeField] private float gizmosHeight = -3.5f;
 
 		[SerializeField] private GizmosDrawingProperty gizmosSurfingEdges;
 		[SerializeField] private GizmosDrawingProperty gizmosHuggingEdges;
@@ -19,13 +19,21 @@ namespace DebugDrawers
 
 		[SerializeField] private bool drawGraphWithInfo = true;
 		[SerializeField] private bool drawSortedCirclePoints = true;
-		public List<NodeWithEdge<Vector2>> path;
 
-		public CircularObsticleGraphGenerator graphGenerator;
+		public List<NodeWithEdge<Vector2>> path;
+		
+		private CircularObsticleGraphGenerator _graphGenerator;
+
+		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<NodeWithEdge<Vector2>> path)
+		{
+			_graphGenerator = graphGenerator;
+			this.path = path;
+		}
 
 		private void OnDrawGizmos()
 		{
 			if (!Application.isPlaying) return;
+			if (_graphGenerator == null || path == null) return;
 
 			if (gizmosSurfingEdges.draw) DrawSurfingEdges();
 			if (gizmosHuggingEdges.draw) DrawHuggingEdges();
@@ -35,15 +43,9 @@ namespace DebugDrawers
 			if (gizmosPath.draw) DrawPath();
 		}
 
-		public void Setup(CircularObsticleGraphGenerator graphGenerator, List<NodeWithEdge<Vector2>> path)
-		{
-			this.graphGenerator = graphGenerator;
-			this.path = path;
-		}
-
 		private void DrawSurfingEdges()
 		{
-			graphGenerator.SurfingEdges.ForEachDictListElem((_, edge) =>
+			_graphGenerator.SurfingEdges.ForEachDictListElem((_, edge) =>
 			{
 				Gizmos.color = gizmosSurfingEdges.color;
 				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
@@ -55,7 +57,7 @@ namespace DebugDrawers
 
 		private void DrawHuggingEdges()
 		{
-			graphGenerator.HuggingEdges.ForEachDictListElem(edge =>
+			_graphGenerator.HuggingEdges.ForEachDictListElem(edge =>
 			{
 				Gizmos.color = gizmosHuggingEdges.color;
 				Gizmos.DrawLine(edge.a.ToVec3(gizmosHeight), edge.b.ToVec3(gizmosHeight));
@@ -64,12 +66,12 @@ namespace DebugDrawers
 
 		private void DrawSortedCirclePoints()
 		{
-			graphGenerator.PointsOnCircle.ForEachDictList((circleHash, pointList) =>
+			_graphGenerator.PointsOnCircle.ForEachDictList((circleHash, pointList) =>
 			{
 				for (var i = 0; i < pointList.Count; i++)
 				{
 					var t = pointList.Count > 1 ? (float) i / (pointList.Count - 1) : 0;
-					var center = graphGenerator.Circles[circleHash].center.ToVec3(gizmosHeight);
+					var center = _graphGenerator.Circles[circleHash].center.ToVec3(gizmosHeight);
 					Gizmos.color = Color.Lerp(Color.red, Color.blue, t);
 					Gizmos.DrawLine(center,
 						Vector3.Lerp(center, pointList[i].ToVec3(gizmosHeight), Mathf.Lerp(0.5f, 1f, t)));
@@ -80,29 +82,33 @@ namespace DebugDrawers
 		private void DrawGraph()
 		{
 			Gizmos.color = gizmosGraph.color;
-			foreach (var node in graphGenerator.graph)
-			foreach (var connectedNode in node.links)
-				Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.node.Content.ToVec3(gizmosHeight));
+			foreach (var node in _graphGenerator.graph)
+			{
+				foreach (var connectedNode in node.links)
+					Gizmos.DrawLine(node.Content.ToVec3(gizmosHeight), connectedNode.node.Content.ToVec3(gizmosHeight));
+			}
 		}
 
 		private void DrawGraphWithInfo()
 		{
-			foreach (var node in graphGenerator.graph)
-			foreach (var nodeWithEdge in node.links)
+			foreach (var node in _graphGenerator.graph)
 			{
-				var height = gizmosHeight;
-				if (nodeWithEdge.graphEdge.info != null && nodeWithEdge.graphEdge.info is EdgeInfo ei)
+				foreach (var nodeWithEdge in node.links)
 				{
-					Gizmos.color = gizmosHuggingEdges.color;
-					Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
-					foreach (var point in ei.arcPoints)
-						Gizmos.DrawSphere(point.ToVec3(height), 0.05f);
-				}
-				else
-				{
-					height -= 0.3f;
-					Gizmos.color = gizmosSurfingEdges.color;
-					Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
+					var height = gizmosHeight;
+					if (nodeWithEdge.graphEdge.info != null && nodeWithEdge.graphEdge.info is EdgeInfo ei)
+					{
+						Gizmos.color = gizmosHuggingEdges.color;
+						Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
+						foreach (var point in ei.arcPoints)
+							Gizmos.DrawSphere(point.ToVec3(height), 0.05f);
+					}
+					else
+					{
+						height -= 0.3f;
+						Gizmos.color = gizmosSurfingEdges.color;
+						Gizmos.DrawLine(node.Content.ToVec3(height), nodeWithEdge.node.Content.ToVec3(height));
+					}
 				}
 			}
 		}

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TestingEnvironmentScripts;
 using UnityEngine;
 
 namespace Pathfinding.CircularObstacleGraph
@@ -8,13 +7,11 @@ namespace Pathfinding.CircularObstacleGraph
 	{
 		public readonly float arcAngle;
 		public readonly List<Vector2> arcPoints;
-		public readonly Neutral obstacleInfo;
 
-		public EdgeInfo(float arcAngle, List<Vector2> arcPoints, Neutral obstacleInfo)
+		public EdgeInfo(float arcAngle, List<Vector2> arcPoints)
 		{
 			this.arcAngle = arcAngle;
 			this.arcPoints = arcPoints;
-			this.obstacleInfo = obstacleInfo;
 		}
 	}
 }

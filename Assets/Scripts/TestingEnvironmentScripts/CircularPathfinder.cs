@@ -13,10 +13,9 @@ namespace TestingEnvironmentScripts
 	public class CircularPathfinder : MonoBehaviour
 	{
 		private Actor _actor;
-		private float _baseActorRadius;
 		private Circle[] _circles;
 
-		private (Transform, CapsuleCollider, Neutral)[] _circlesObstacles;
+		private (Transform, CircularObstacle)[] _circlesObstacles;
 
 		#region Debug Fields
 
@@ -43,15 +42,14 @@ namespace TestingEnvironmentScripts
 		private void Start()
 		{
 			GetObstacles();
-			_baseActorRadius = GetComponent<CapsuleCollider>().radius;
-			_actor = new Actor(_baseActorRadius);
+			_actor = new Actor(GetComponent<CapsuleCollider>().radius * 1.3f);
 
 			_graphGenerator = new CircularObsticleGraphGenerator();
 			_graphGenerator.graph.SetContentEqualsComparer((v1, v2) => v1.AlmostEqual(v2, 0.05f));
 			_graphGenerator.SetActor(_actor);
 			_pathfinder = new AStar<Vector2>(_graphGenerator.graph, AStarHeuristic<Vector2>.EuclideanDistance);
 			
-			_expander = new CircularGraphExpander(_graphGenerator, 0.1f);
+			_expander = new CircularGraphExpander(_graphGenerator, 0.2f);
 
 			if (!_debugDrawer.IsRealNull())
 				_debugDrawer.Setup(_graphGenerator, _path);
@@ -98,7 +96,7 @@ namespace TestingEnvironmentScripts
 			catch (IncompletePathException e)
 			{
 				Debug.LogWarning(e.Message);
-				// return false;
+				return false;
 			}
 
 			return true;
@@ -160,12 +158,8 @@ namespace TestingEnvironmentScripts
 
 		private void GetObstacles()
 		{
-			_circlesObstacles = FindObjectsOfType<Neutral>()
-				.Select(n => (n.GetComponent<CapsuleCollider>(), n))
-				.Where(tuple =>
-					tuple.n.gameObject.activeSelf && tuple.n.gameObject != gameObject)
-				.Select(tuple =>
-					(tuple.n.gameObject.transform, tuple.Item1, tuple.n))
+			_circlesObstacles = FindObjectsOfType<CircularObstacle>()
+				.Select(co => (co.gameObject.transform, co))
 				.ToArray();
 		}
 
@@ -173,7 +167,7 @@ namespace TestingEnvironmentScripts
 		{
 			_circles = _circlesObstacles
 				.Select(tuple => 
-					new Circle(tuple.Item2.ScaledRadius(), tuple.Item1.position.ToVec2(), tuple.Item3))
+					new Circle(tuple.Item2.Radius, tuple.Item1.position.ToVec2()))
 				.ToArray();
 		}
 

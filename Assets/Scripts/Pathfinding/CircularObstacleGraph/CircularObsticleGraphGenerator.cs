@@ -261,10 +261,8 @@ namespace Pathfinding.CircularObstacleGraph
 			var splits = circle.ArcLength(arcAngle * Mathf.Rad2Deg) * 3;
 			var arcPoints = MathUtils.SplitArc(point1Origin, point2Origin, splits <= 1 ? 1 : (int)splits)
 				.Select(p => p + center).ToList(); // move arc points from origin to their original position
-			
-			if (circle.TryGetInfo(out var info) && info is Neutral neutral)
-				return new EdgeInfo(arcAngle, arcPoints, neutral);
-			return new EdgeInfo(arcAngle, arcPoints, null);
+
+			return new EdgeInfo(arcAngle, arcPoints);
 		}
 
 		private void ThrowHuggingEdgesOut()
