@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using Components.Interfaces;
+using UnityEngine;
 using Utils;
 
 namespace Components
 {
-	public class Neutral : MonoBehaviour
+	public class Neutral : MonoBehaviour, IMovementAgent
 	{
 		[SerializeField] private Color selectionColor = Color.green;
 
@@ -14,6 +15,9 @@ namespace Components
 
 		public Vector2 StartPos { get; set; }
 		public Vector2? Goal { get; private set; }
+		
+		public Vector2? GetGoal() => Goal;
+		public float GetSpeed() => movement.Speed;
 
 		private CircularPathfinder _pathfinder;
 		
