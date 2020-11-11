@@ -5,6 +5,7 @@ using ScriptableObjects;
 using UnityEngine;
 using Utils;
 using Vector2 = UnityEngine.Vector2;
+// ReSharper disable PossibleInvalidOperationException
 
 namespace Components
 {
@@ -12,11 +13,22 @@ namespace Components
 	{
 		[SerializeField] private ObstacleAvoidanceSimulationSpec simulationSpec;
 		[SerializeField] private List<CollisionAvoidanceAgent> avoidanceAgents;
+
+		#region Debug
 		
+		private enum MovementType
+		{
+			Position,
+			Velocity
+		}
+
+		[Header("Debug Fields")]
+		[SerializeField] private MovementType movementType;
+
+		#endregion
+
 		private void Start()
 		{
-			Simulator.Instance.setTimeStep(simulationSpec.TimeStep);
-
 			foreach (var agent in avoidanceAgents)
 				Simulator.Instance.AddUnityAgent(agent);
 		}
@@ -25,6 +37,8 @@ namespace Components
 		{
 			UpdatePositions();
 			SetPreferredVelocities();
+			UpdateGoals();
+			Simulator.Instance.setTimeStep(Time.deltaTime);
 			Simulator.Instance.doStep();
 		}
 
@@ -33,10 +47,10 @@ namespace Components
 			for (var i = 0; i < Simulator.Instance.getNumAgents(); i++)
 			{
 				var dirToGoal = Vector2.zero;
-				if (avoidanceAgents[i].Goal != null)
-					dirToGoal = (Vector2.zero - Simulator.Instance.getAgentPosition(i).ToUnityVec2()).normalized;
+				if (avoidanceAgents[i].MovementAgent.GetGoal() != null)
+					dirToGoal = (avoidanceAgents[i].MovementAgent.GetGoal().Value - Simulator.Instance.getAgentPosition(i).ToUnityVec2()).normalized;
 				
-				Simulator.Instance.setAgentPrefVelocity(i, dirToGoal.ToRVOVec2() * avoidanceAgents[i].Speed);
+				Simulator.Instance.setAgentPrefVelocity(i, dirToGoal.ToRVOVec2() * avoidanceAgents[i].MovementAgent.GetSpeed());
 			}
 		}
 
@@ -44,7 +58,28 @@ namespace Components
 		{
 			for (var i = 0; i < Simulator.Instance.getNumAgents(); i++)
 			{
-				avoidanceAgents[i].Move(Simulator.Instance.getAgentVelocity(i).ToUnityVec2());
+				switch (movementType)
+				{
+					case MovementType.Velocity:
+						avoidanceAgents[i].Move(Simulator.Instance.getAgentVelocity(i).ToUnityVec2());
+						break;
+					case MovementType.Position:
+						var p = avoidanceAgents[i].transform.position;
+						avoidanceAgents[i].transform.position = Simulator.Instance.getAgentPosition(i).ToUnityVec3(p.y);
+						break;
+				}
+			}
+		}
+
+		private void UpdateGoals()
+		{
+			for (var i = 0; i < Simulator.Instance.getNumAgents(); i++)
+			{
+				if (avoidanceAgents[i].MovementAgent.GetGoal() == null)
+					continue;
+				if (Vector2.Distance(avoidanceAgents[i].MovementAgent.GetGoal().Value, Simulator.Instance.getAgentPosition(i).ToUnityVec2()) <=
+				    simulationSpec.GoalReachDistance)
+					avoidanceAgents[i].MovementAgent.UnsetGoal();
 			}
 		}
 		

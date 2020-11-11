@@ -13,19 +13,16 @@ namespace Components
 		[Tooltip("If no capsule collider assigned, using this value.")]
 		[SerializeField] private float radius;
 		public float Radius => _capsuleCollider.IsRealNull() ? radius : _capsuleCollider.radius;
-
-		public float Speed => _movementAgent.GetSpeed();
-
-		public Vector2? Goal => _movementAgent.GetGoal();
 		
+		public IMovementAgent MovementAgent { get; private set; }
+
 		private CapsuleCollider _capsuleCollider;
-		private IMovementAgent _movementAgent;
 		private Movement _movement;
 		
 		private void Awake()
 		{
 			_capsuleCollider = GetComponent<CapsuleCollider>();
-			_movementAgent = GetComponent<IMovementAgent>();
+			MovementAgent = GetComponent<IMovementAgent>();
 			_movement = GetComponent<Movement>();
 		}
 

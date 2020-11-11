@@ -6,5 +6,6 @@ namespace Components.Interfaces
 	{
 		Vector2? GetGoal();
 		float GetSpeed();
+		void UnsetGoal();
 	}
 }

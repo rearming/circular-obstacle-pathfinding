@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dc20241cd0848aa9b22e584299558cb, type: 3}
   m_Name: ObstacleAvoidanceSimulationSpec_1
   m_EditorClassIdentifier: 
-  timeStep: 0
+  goalReachDistance: 0.1

@@ -123,12 +123,5 @@ namespace DebugDrawers
 			for (var i = 1; i < path.Count; i++)
 				Gizmos.DrawLine(path[i - 1].node.Content.ToVec3(gizmosHeight), path[i].node.Content.ToVec3(gizmosHeight));
 		}
-
-		[Serializable]
-		private class GizmosDrawingProperty
-		{
-			public bool draw = true;
-			public Color color = Color.green;
-		}
 	}
 }

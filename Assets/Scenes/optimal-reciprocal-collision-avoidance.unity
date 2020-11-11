@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 183691583}
   - component: {fileID: 183691582}
+  - component: {fileID: 183691584}
   m_Layer: 0
   m_Name: Collision Avoidance System
   m_TagString: Untagged
@@ -152,12 +153,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19cf8620da0342ada5ff029c33bc3aba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulationSpec: {fileID: 0}
+  simulationSpec: {fileID: 11400000, guid: 746b18fc54e16a941adee008a3f8ead0, type: 2}
   avoidanceAgents:
   - {fileID: 765640005}
   - {fileID: 765640004}
   - {fileID: 765640003}
   - {fileID: 765640002}
+  movementType: 0
 --- !u!4 &183691583
 Transform:
   m_ObjectHideFlags: 0
@@ -172,6 +174,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &183691584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183691581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e71443e098ce48ee8ac73e41309d4d4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gizmosHeight: -3.5
+  preferredVelocityVectors:
+    draw: 1
+    color: {r: 0.07831963, g: 0.5660378, b: 0.07831963, a: 1}
+  realVelocityVectors:
+    draw: 1
+    color: {r: 0.9433962, g: 0, b: 0.018498132, a: 1}
 --- !u!1 &204453357
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,6 +373,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 8545029339858263196, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
+      propertyPath: movementSpec
+      value: 
+      objectReference: {fileID: 11400000, guid: 88265e1cd99f20c4fad6c0ec9424991d, type: 2}
     - target: {fileID: 8545029340332673776, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
       propertyPath: m_Name
       value: Neutrals Squad
@@ -400,6 +425,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8545029340467305289, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
+      propertyPath: movementSpec
+      value: 
+      objectReference: {fileID: 11400000, guid: 88265e1cd99f20c4fad6c0ec9424991d, type: 2}
+    - target: {fileID: 8545029340722380873, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
+      propertyPath: movementSpec
+      value: 
+      objectReference: {fileID: 11400000, guid: 88265e1cd99f20c4fad6c0ec9424991d, type: 2}
+    - target: {fileID: 8545029340963896628, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
+      propertyPath: movementSpec
+      value: 
+      objectReference: {fileID: 11400000, guid: 88265e1cd99f20c4fad6c0ec9424991d, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
 --- !u!1 &765639998 stripped
@@ -434,7 +471,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 0}
+  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
   radius: 0
 --- !u!114 &765640003
 MonoBehaviour:
@@ -448,7 +485,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 0}
+  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
   radius: 0
 --- !u!114 &765640004
 MonoBehaviour:
@@ -462,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 0}
+  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
   radius: 0
 --- !u!114 &765640005
 MonoBehaviour:
@@ -476,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 0}
+  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
   radius: 0
 --- !u!1 &1478243583
 GameObject:
@@ -650,8 +687,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: 0.05441352, y: -0.83825415, z: 0.53587633, w: 0.08488712}
-  m_LocalPosition: {x: 6.7113256, y: 12.196812, z: 3.3950624}
+  m_LocalRotation: {x: 0.6884085, y: 0.0043546124, z: -0.0044272244, w: 0.7252967}
+  m_LocalPosition: {x: -4.4524217, y: 23.369564, z: -9.920175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
