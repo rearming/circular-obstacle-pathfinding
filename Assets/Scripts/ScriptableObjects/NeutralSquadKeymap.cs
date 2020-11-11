@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ScriptableObjects
 {
-	[CreateAssetMenu(fileName = "Neutral Squad Keymap_1", menuName = "Keymaps/Neutral Squad", order = 0)]
+	[CreateAssetMenu(fileName = "NeutralSquadKeymap_1", menuName = "Keymaps/Neutral Squad", order = 0)]
 	public class NeutralSquadKeymap : ScriptableObject
 	{
 		[Serializable]

@@ -31,40 +31,27 @@ namespace Components
 
 		private void Update()
 		{
-			if (Goal != null)
+			if (Goal != null && !_pathfinder.IsRealNull())
 				movement.MoveTowards(_pathfinder.GetNextPos());
 		}
 		
-		public void OnSelect()
-		{
-			Material.color = selectionColor;
-		}
+		public void OnSelect() => Material.color = selectionColor;
 
-		public void OnDeselect()
-		{
-			Material.color = _baseColor;
-		}
+		public void OnDeselect() => Material.color = _baseColor;
 
-		public void SetStart()
-		{
-			StartPos = transform.position.ToVec2();
-		}
+		public void SetStart() => StartPos = transform.position.ToVec2();
 
-		public void SetStart(Vector2 startPos)
-		{
-			StartPos = startPos;
-		}
+		public void SetStart(Vector2 startPos) => StartPos = startPos;
 
-		public void SetGoal(Vector3 target)
-		{
-			SetGoal(target.ToVec2());
-		}
+		public void SetGoal(Vector3 target) => SetGoal(target.ToVec2());
 
 		public void SetGoal(Vector2 target)
 		{
 			Goal = target;
 			StartPos = transform.position.ToVec2();
-			_pathfinder.StartPathfing();
+			
+			if (!_pathfinder.IsRealNull())
+				_pathfinder.StartPathfing();
 		}
 
 		public void UnsetGoal()

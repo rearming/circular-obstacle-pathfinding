@@ -13,11 +13,23 @@ namespace Components
 
 		public Vector2 MovementDir { get; set; }
 		public float Speed => movementSpec.Speed;
+		public Vector2? Velocity { get; private set; }
 
 		private Coroutine _moveByPointsRoutine;
 		private Coroutine _moveTowardsRoutine;
 
 		private const float DefaultPointReachDistance = 0.05f;
+
+		public void MoveVelocity(Vector2 velocity)
+		{
+			Velocity = velocity;
+		}
+
+		public void Stop()
+		{
+			StopAllCoroutines();
+			MovementDir = Vector2.zero;
+		}
 
 		public void MoveByPoints(List<Vector2> points, float pointReachDistance = DefaultPointReachDistance, Action onMovementEnded = null)
 		{
@@ -33,15 +45,12 @@ namespace Components
 			_moveTowardsRoutine = StartCoroutine(MoveTowardsRoutine(pos, pointReachDistance, onPointReached));
 		}
 
-		public void Stop()
+		private void FixedUpdate()
 		{
-			StopAllCoroutines();
-			MovementDir = Vector2.zero;
-		}
-
-		private void Update()
-		{
-			transform.position += new Vector3(MovementDir.x, 0, MovementDir.y) * (movementSpec.Speed * Time.deltaTime);
+			if (Velocity != null)
+				transform.position += new Vector3(Velocity.Value.x, 0, Velocity.Value.y) * Time.deltaTime; 
+			else
+				transform.position += new Vector3(MovementDir.x, 0, MovementDir.y) * (movementSpec.Speed * Time.deltaTime);
 		}
 
 		private IEnumerator MoveByPointsRoutine(List<Vector2> points, float pointReachDistance, Action onMovementEnded)

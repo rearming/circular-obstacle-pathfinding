@@ -1,0 +1,3 @@
+[submodule "Assets/Externals/RVO2-CS"]
+	path = Assets/Externals/RVO2-CS
+	url = https://github.com/snape/RVO2-CS.git
