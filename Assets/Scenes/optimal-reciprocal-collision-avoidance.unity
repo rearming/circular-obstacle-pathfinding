@@ -159,7 +159,7 @@ MonoBehaviour:
   - {fileID: 765640004}
   - {fileID: 765640003}
   - {fileID: 765640002}
-  movementType: 0
+  movementType: 1
 --- !u!4 &183691583
 Transform:
   m_ObjectHideFlags: 0
@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 204453358}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -226,8 +226,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21b1ea5bb3624a25948639eca63d8d15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  invertX: 1
-  invertY: 1
+  invertX: 0
+  invertY: 0
 --- !u!114 &204453359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,7 +471,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
+  agentSpec: {fileID: 11400000, guid: efd48cf91622a3640b3bd457a837041d, type: 2}
   radius: 0
 --- !u!114 &765640003
 MonoBehaviour:
@@ -485,7 +485,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
+  agentSpec: {fileID: 11400000, guid: efd48cf91622a3640b3bd457a837041d, type: 2}
   radius: 0
 --- !u!114 &765640004
 MonoBehaviour:
@@ -499,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
+  agentSpec: {fileID: 11400000, guid: efd48cf91622a3640b3bd457a837041d, type: 2}
   radius: 0
 --- !u!114 &765640005
 MonoBehaviour:
@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 11400000, guid: 137392424a453494cacfa0dd3c421104, type: 2}
+  agentSpec: {fileID: 11400000, guid: efd48cf91622a3640b3bd457a837041d, type: 2}
   radius: 0
 --- !u!1 &1478243583
 GameObject:

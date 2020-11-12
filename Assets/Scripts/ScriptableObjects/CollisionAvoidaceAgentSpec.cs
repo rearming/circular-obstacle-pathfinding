@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ScriptableObjects
 {
 	[CreateAssetMenu(fileName = "Obstacle Avoidance Agent_1", menuName = "Specs/Obstacle Avoidance/Agent", order = 0)]
-	public class ObstacleAvoidaceAgentSpec : ScriptableObject
+	public class CollisionAvoidaceAgentSpec : ScriptableObject
 	{
 		[Tooltip("The maximum distance (center point to center point) to other agents this agent takes into account in the navigation. " +
 		         "The larger this number, the longer the running time of the simulation. " +

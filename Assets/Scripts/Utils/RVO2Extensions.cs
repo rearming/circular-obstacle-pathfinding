@@ -1,4 +1,5 @@
 using Components;
+using ScriptableObjects;
 using UnityEngine;
 
 namespace Utils
@@ -9,8 +10,16 @@ namespace Utils
 		{
 			var i = simulator.addAgent(agent.transform.position.ToRVOVec2(), agent.AgentSpec.NeighborsDistance,
 				agent.AgentSpec.MaxNeighbors, agent.AgentSpec.TimeHorizon, agent.AgentSpec.TimeHorizonObstacles,
-				agent.Radius, 10f, 
+				agent.Radius, agent.AgentSpec.MaxSpeedMultiplier * agent.MovementAgent.GetSpeed(), 
 				agent.AgentSpec.InitialVelocity.ToRVOVec2());
+		}
+		
+		public static void AddUnityAgent(this RVO.Simulator simulator, Vector3 position, float radius, float speed, CollisionAvoidaceAgentSpec spec)
+		{
+			var i = simulator.addAgent(position.ToRVOVec2(), spec.NeighborsDistance,
+				spec.MaxNeighbors, spec.TimeHorizon, spec.TimeHorizonObstacles,
+				radius, speed * spec.MaxSpeedMultiplier, 
+				spec.InitialVelocity.ToRVOVec2());
 		}
 
 		public static RVO.Vector2 ToRVOVec2(this UnityEngine.Vector2 vec) => new RVO.Vector2(vec.x, vec.y);

@@ -10,14 +10,14 @@ namespace Components
 
 		private Action _selection;
 		private Action _move;
-		private Action _multipleSelection;
 		private Action _toggleStopMovement;
+		private Action<bool> _toggleMultipleSelection;
 
-		public void SetupCallbacks(Action selection, Action move, Action multipleSelection, Action toggleStopMovement)
+		public void SetupCallbacks(Action selection, Action move, Action toggleStopMovement, Action<bool> toggleMultipleSelection)
 		{
 			_selection = selection;
 			_move = move;
-			_multipleSelection = multipleSelection;
+			_toggleMultipleSelection = toggleMultipleSelection;
 			_toggleStopMovement = toggleStopMovement;
 		}
 		
@@ -25,8 +25,9 @@ namespace Components
 		{
 			if (Input.GetMouseButtonDown((int) keymap.SelectButton)) _selection.Invoke();
 			if (Input.GetMouseButtonDown((int) keymap.MoveButton)) _move.Invoke();
-			if (Input.GetKey(keymap.MultipleSelection)) _multipleSelection.Invoke();
 			if (Input.GetKeyDown(keymap.ToggleStopMovement)) _toggleStopMovement.Invoke();
+			if (Input.GetKey(keymap.MultipleSelection)) _toggleMultipleSelection.Invoke(true);
+			if (Input.GetKeyUp(keymap.MultipleSelection)) _toggleMultipleSelection.Invoke(false);
 		}
 	}
 }

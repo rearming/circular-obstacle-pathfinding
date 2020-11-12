@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Pathfinding.CircularObstacleGraph;
 using Pathfinding.Graph;

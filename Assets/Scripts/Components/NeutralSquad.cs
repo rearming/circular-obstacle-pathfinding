@@ -33,8 +33,8 @@ namespace Components
 			input.SetupCallbacks(
 				SelectNeutral,
 				MoveNeutralsToMousePos,
-				() => _multipleSelection = true,
-				ToggleStopNeutrals);
+				ToggleStopNeutrals, 
+				enable => _multipleSelection = enable);
 		}
 
 		private void SelectNeutral()

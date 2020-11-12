@@ -1,17 +1,15 @@
-using System;
 using RVO;
 using UnityEngine;
 using Utils;
 
 namespace DebugDrawers
 {
-	public class ObstacleAvoidanceDrawer : MonoBehaviour
+	public class CollisionAvoidanceDrawer : MonoBehaviour
 	{
 		[SerializeField] private float gizmosHeight = -3.5f;
 		[SerializeField] private GizmosDrawingProperty preferredVelocityVectors;
 		[SerializeField] private GizmosDrawingProperty realVelocityVectors;
-		// [SerializeField] private GizmosDrawingProperty 
-		
+
 		private void OnDrawGizmos()
 		{
 			if (!Application.isPlaying) return;

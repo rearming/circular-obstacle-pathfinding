@@ -7,10 +7,10 @@ namespace Components
 {
 	public class CollisionAvoidanceAgent : MonoBehaviour
 	{
-		[SerializeField] private ObstacleAvoidaceAgentSpec agentSpec;
-		public ObstacleAvoidaceAgentSpec AgentSpec => agentSpec;
+		[SerializeField] private CollisionAvoidaceAgentSpec agentSpec;
+		public CollisionAvoidaceAgentSpec AgentSpec => agentSpec;
 
-		[Tooltip("If no capsule collider assigned, using this value.")]
+		[Tooltip("If no Capsule Collider assigned, using this value.")]
 		[SerializeField] private float radius;
 		public float Radius => _capsuleCollider.IsRealNull() ? radius : _capsuleCollider.radius;
 		

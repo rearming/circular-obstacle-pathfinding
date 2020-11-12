@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b832a86518934487a8dcc72e20d877d3, type: 3}
   m_Name: Obstacle Avoidance Agent_1
   m_EditorClassIdentifier: 
-  neighborsDistance: 15
-  maxNeighbors: 10
-  timeHorizon: 10
-  timeHorizonObstacles: 10
-  maxSpeedMultiplier: 1.5
+  neighborsDistance: 5
+  maxNeighbors: 4
+  timeHorizon: 2
+  timeHorizonObstacles: 2
+  maxSpeedMultiplier: 3
+  initialVelocity: {x: 0, y: 0}
