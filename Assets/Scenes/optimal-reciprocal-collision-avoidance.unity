@@ -380,7 +380,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &264602615
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -712,11 +712,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8545029340963896630, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
   m_PrefabInstance: {fileID: 765639997}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &765640001 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8545029339858263198, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
-  m_PrefabInstance: {fileID: 765639997}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &765640002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -759,20 +754,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agentSpec: {fileID: 11400000, guid: efd48cf91622a3640b3bd457a837041d, type: 2}
   radius: 0
---- !u!114 &765640005
+--- !u!114 &765640005 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 1163083634329799181, guid: 2aa041f89acf21e4fb1e95d49c97167d, type: 3}
+  m_PrefabInstance: {fileID: 765639997}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 765640001}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7796736556c14a98a108d7e8a9913f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentSpec: {fileID: 11400000, guid: efd48cf91622a3640b3bd457a837041d, type: 2}
-  radius: 0
 --- !u!1 &1478243583
 GameObject:
   m_ObjectHideFlags: 0

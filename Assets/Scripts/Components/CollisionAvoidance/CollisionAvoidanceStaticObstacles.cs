@@ -21,7 +21,7 @@ namespace Components.CollisionAvoidance
 			_overlapper = GetComponent<CollisionAvoidanceOverlapper>();
 			_overlapper.SetupCallbacks(contacts =>
 			{
-				Obstacles = contacts.Select(list => list.Select(v => v.ToRVOVec2()).ToList()).ToList();
+				Obstacles = contacts.Select(list => list.Select(v => v.ToRVOVec2()).Reverse().ToList()).ToList();
 			});
 		}
 

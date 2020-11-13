@@ -39,6 +39,7 @@ namespace Components.CollisionAvoidance
 			
 			_contactPoints.Clear();
 			_collisionsExpected = GameObject.FindGameObjectsWithTag(obstacleTag).Length;
+			_collisionsHappened = 0;
 			_boxCollider.enabled = true;
 			
 			yield return new WaitUntil(() => _collisionsHappened == _collisionsExpected);
