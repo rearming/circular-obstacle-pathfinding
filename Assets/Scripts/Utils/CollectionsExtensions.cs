@@ -38,6 +38,14 @@ namespace Utils
 		{
 			hashSet.UnionWith(hashSetToAdd);
 		}
+		
+		public static HashSet<T> ToHashSet<T>(this IEnumerable<T> list)
+		{
+			var hashSet = new HashSet<T>();
+			foreach (var t in list)
+				hashSet.Add(t);
+			return hashSet;
+		}
 
 		#endregion
 
@@ -106,6 +114,26 @@ namespace Utils
 				dictionary[key].RemoveAt(idx);
 		}
 
+		/// <summary>
+		/// Works same as ToDictionary(), but doesn't add duplicates and doesn't throwing exceptions because of them.
+		/// </summary>
+		public static Dictionary<TKey, TSource> ToDictionarySafe<TKey, TSource>(this IEnumerable<TSource> collection, Func<TSource, TKey> keySelector)
+		{
+			var dict = new Dictionary<TKey, TSource>();
+			foreach (var item in collection)
+			{
+				if (dict.ContainsKey(keySelector(item)))
+					continue;
+				dict.Add(keySelector(item), item);
+			}
+			return dict;
+		}
+
 		#endregion
+
+		public static IEnumerable<TSource> RemoveDuplicates<TSource, TKey>(this IEnumerable<TSource> collection, Func<TSource, TKey> keySelector)
+		{
+			return collection.ToDictionarySafe(keySelector).Values;
+		}
 	}
 }

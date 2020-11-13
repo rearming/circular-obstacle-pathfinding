@@ -3,7 +3,7 @@ using ScriptableObjects;
 using UnityEngine;
 using Utils;
 
-namespace Components
+namespace Components.CollisionAvoidance
 {
 	public class CollisionAvoidanceAgent : MonoBehaviour
 	{

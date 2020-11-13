@@ -8,7 +8,7 @@ using Utils;
 using Vector2 = UnityEngine.Vector2;
 // ReSharper disable PossibleInvalidOperationException
 
-namespace Components
+namespace Components.CollisionAvoidance
 {
 	public class CollisionAvoidanceSystem : MonoBehaviour
 	{
@@ -16,6 +16,7 @@ namespace Components
 		[SerializeField] private List<CollisionAvoidanceAgent> avoidanceAgents;
 
 		private List<(Movement, CapsuleCollider)> _players;
+		private CollisionAvoidanceStaticObstacles _avoidanceStaticObstacles;
 		
 		#region Debug
 		
@@ -32,6 +33,8 @@ namespace Components
 
 		private void Awake()
 		{
+			_avoidanceStaticObstacles = GetComponent<CollisionAvoidanceStaticObstacles>();
+			
 			_players = GameObject
 				.FindGameObjectsWithTag("Player")
 				.Select(go => (go.GetComponent<Movement>(), go.GetComponent<CapsuleCollider>()))
@@ -49,6 +52,7 @@ namespace Components
 			foreach (var agent in avoidanceAgents)
 				Simulator.Instance.AddUnityAgent(agent);
 			AddPlayers();
+			_avoidanceStaticObstacles.AddObstacles();
 		}
 
 		private void AddPlayers()
@@ -148,8 +152,8 @@ namespace Components
 				.ToList();
 		}
 		
-		[ContextMenu(nameof(ReassignAgentsSettings))]
-		private void ReassignAgentsSettings()
+		[ContextMenu(nameof(ResetSimulation))]
+		private void ResetSimulation()
 		{
 			SetupSimulation();
 		}
