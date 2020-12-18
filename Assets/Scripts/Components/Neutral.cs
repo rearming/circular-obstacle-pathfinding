@@ -23,7 +23,7 @@ namespace Components
 		
 		private void Awake()
 		{
-			Material = GetComponent<Renderer>().material;
+			Material = GetComponentInChildren<Renderer>().material;
 			movement = GetComponent<Movement>();
 			_pathfinder = GetComponent<CircularPathfinder>();
 		}

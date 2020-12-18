@@ -15,6 +15,6 @@ MonoBehaviour:
   neighborsDistance: 4
   maxNeighbors: 6
   timeHorizon: 3
-  timeHorizonObstacles: 4
+  timeHorizonObstacles: 2
   maxSpeedMultiplier: 5
   initialVelocity: {x: 0, y: 0}
